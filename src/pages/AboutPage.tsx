@@ -2,6 +2,7 @@ import React from 'react';
 import { useNavigation } from '../context/NavigationContext';
 import { useTheme } from '../context/ThemeContext';
 import { ArrowRight, Sparkles, Code2, HeartHandshake, Eye } from 'lucide-react';
+import heroHavenWolfNightImg from '../assets/images/hero_haven_wolf_night_1790340961914.jpg';
 
 export const AboutPage: React.FC = () => {
   const { navigateTo } = useNavigation();
@@ -108,7 +109,7 @@ export const AboutPage: React.FC = () => {
         >
           <div className="w-24 h-24 rounded-2xl overflow-hidden shrink-0 border border-purple-500/30 shadow-lg">
             <img
-              src="/src/assets/images/hero_haven_wolf_night_1790340961914.jpg"
+              src={heroHavenWolfNightImg}
               alt="The HAVEN Wolf"
               referrerPolicy="no-referrer"
               className="w-full h-full object-cover"

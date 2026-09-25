@@ -2,6 +2,8 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useNavigation } from '../../context/NavigationContext';
 import { useTheme } from '../../context/ThemeContext';
 import { ArrowRight, Sparkles, Moon, Sun, ShoppingBag, Terminal, Palette, Crown, Building2 } from 'lucide-react';
+import havenWolfNightImg from '../../assets/images/haven_wolf_night_1790347456490.jpg';
+import havenDayCityImg from '../../assets/images/haven_day_city_1790347468632.jpg';
 
 export const HeroSplit: React.FC = () => {
   const { navigateTo } = useNavigation();
@@ -130,7 +132,7 @@ export const HeroSplit: React.FC = () => {
           }}
         >
           <img
-            src="/src/assets/images/haven_wolf_night_1790347456490.jpg"
+            src={havenWolfNightImg}
             alt="HAVEN Majestic Dark Wolf in Nocturnal Mountain Environment with Violet Atmospheric Lighting"
             referrerPolicy="no-referrer"
             className="w-full h-full object-cover object-center"
@@ -155,7 +157,7 @@ export const HeroSplit: React.FC = () => {
           }}
         >
           <img
-            src="/src/assets/images/haven_day_city_1790347468632.jpg"
+            src={havenDayCityImg}
             alt="HAVEN Sunlit Mountain Valley with Modern Skyline and Lake at Dawn"
             referrerPolicy="no-referrer"
             className="w-full h-full object-cover object-center"

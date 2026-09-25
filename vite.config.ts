@@ -1,11 +1,26 @@
 import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
-import {defineConfig} from 'vite';
+import { defineConfig } from 'vite';
 
 export default defineConfig(() => {
   return {
-    plugins: [react(), tailwindcss()],
+    base: '/haven_web/',
+    plugins: [
+      react(),
+      tailwindcss(),
+      {
+        name: 'dev-root-fallback',
+        configureServer(server) {
+          server.middlewares.use((req, res, next) => {
+            if (req.url === '/' || req.url === '/index.html') {
+              req.url = '/haven_web/';
+            }
+            next();
+          });
+        },
+      },
+    ],
     resolve: {
       alias: {
         '@': path.resolve(__dirname, '.'),

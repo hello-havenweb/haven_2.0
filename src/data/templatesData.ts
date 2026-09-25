@@ -1,4 +1,10 @@
 import { TemplateItem } from '../types';
+import templateNexusImg from '../assets/images/template_nexus_gaming_1790340995454.jpg';
+import templateVintageImg from '../assets/images/template_vintage_atelier_1790341012673.jpg';
+import templateOrbitImg from '../assets/images/template_orbit_spatial_1790342995376.jpg';
+import templateLumiImg from '../assets/images/template_lumi_minimal_1790341046258.jpg';
+import templateBusinessImg from '../assets/images/template_business_apex_1790341065387.jpg';
+import templateRestaurantImg from '../assets/images/template_restaurant_luxe_1790341030030.jpg';
 
 export const TEMPLATES_DATA: TemplateItem[] = [
   {
@@ -9,7 +15,7 @@ export const TEMPLATES_DATA: TemplateItem[] = [
     categorySlug: 'gaming',
     description: 'Dark cyber-aesthetic powerhouse with live tournament brackets, champion rosters, match countdowns, and high-octane community integration.',
     longDescription: 'Nexus Gaming delivers an electric, high-performance web experience crafted for esports teams, gaming guilds, streamers, and indie game developers. Built with high-contrast cyber visuals, tournament schedules, and instant Discord CTA integration.',
-    previewImage: '/src/assets/images/template_nexus_gaming_1790340995454.jpg',
+    previewImage: templateNexusImg,
     accentColor: '#8b5cf6',
     features: [
       'Interactive Tournament Bracket View',
@@ -29,7 +35,7 @@ export const TEMPLATES_DATA: TemplateItem[] = [
     categorySlug: 'vintage',
     description: 'Warm editorial storytelling, serif typography, archival photography grids, and an intimate bespoke consultation appointment flow.',
     longDescription: 'Crafted for luxury watchmakers, bespoke tailoring ateliers, antique galleries, and heritage brands. Features graceful serif typography, historical timeline milestones, and high-fidelity artisan craft galleries.',
-    previewImage: '/src/assets/images/template_vintage_atelier_1790341012673.jpg',
+    previewImage: templateVintageImg,
     accentColor: '#d4af37',
     features: [
       'Archival Editorial Typographic Hierarchy',
@@ -49,7 +55,7 @@ export const TEMPLATES_DATA: TemplateItem[] = [
     categorySlug: 'orbit',
     description: 'Deep cosmic aesthetic with holographic glass surfaces, interactive orbital system nodes, spatial product showcases, and interactive 3D particle atmosphere.',
     longDescription: 'Engineered for avant-garde technology labs, AI research studios, spatial computing platforms, and visionary creative technology houses. Combines astronomical visual depth, glass holographic interfaces, and real-time interactive nodes.',
-    previewImage: '/src/assets/images/template_orbit_spatial_1790342995376.jpg',
+    previewImage: templateOrbitImg,
     accentColor: '#a855f7',
     features: [
       'Interactive 3D Orbital Node Inspector',
@@ -69,7 +75,7 @@ export const TEMPLATES_DATA: TemplateItem[] = [
     categorySlug: 'minimal',
     description: 'Clean spatial layouts, monochromatic surfaces, frosted glass panels, and interactive product feature toggles.',
     longDescription: 'Engineered for cutting-edge digital agencies, industrial design studios, and hardware innovators. Focuses on breathtaking negative space, subtle lighting transitions, and precise product storytelling.',
-    previewImage: '/src/assets/images/template_lumi_minimal_1790341046258.jpg',
+    previewImage: templateLumiImg,
     accentColor: '#38bdf8',
     features: [
       'Refined Monochromatic Spatial Canvas',
@@ -89,7 +95,7 @@ export const TEMPLATES_DATA: TemplateItem[] = [
     categorySlug: 'business',
     description: 'Deep obsidian & navy corporate architecture with practice area breakdowns, interactive growth estimator, and executive consultation scheduling.',
     longDescription: 'Built for enterprise consultancies, venture capital firms, corporate legal partners, and financial advisors. Emphasizes quantitative impact, advisory team credentials, and rapid qualified inquiry capture.',
-    previewImage: '/src/assets/images/template_business_apex_1790341065387.jpg',
+    previewImage: templateBusinessImg,
     accentColor: '#3b82f6',
     features: [
       'Interactive ROI & Enterprise Growth Calculator',
@@ -109,7 +115,7 @@ export const TEMPLATES_DATA: TemplateItem[] = [
     categorySlug: 'restaurant',
     description: 'Moody candlelit slate ambience, multi-course tasting menus with dietary toggles, cellar selections, and live table reservation booking.',
     longDescription: 'Designed for Michelin-starred restaurants, boutique bistro concepts, and luxury culinary lounges. Features appetizing dish spotlights, sommelier wine curation, chef philosophy, and a complete table reservation booking engine.',
-    previewImage: '/src/assets/images/template_restaurant_luxe_1790341030030.jpg',
+    previewImage: templateRestaurantImg,
     accentColor: '#f59e0b',
     features: [
       'Interactive Multi-Course Tasting Menu with Filter',
