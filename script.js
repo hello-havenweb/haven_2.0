@@ -481,7 +481,7 @@ function initHavenAI() {
     referenceWebsites: '', additionalRequirements: ''
   };
 
-  const API_BASE_URL = (window.HAVEN_API_BASE_URL || '').replace(/\/$/, '');
+  const API_BASE_URL = 'YOUR_BACKEND_URL'.replace(/\/$/, '');
   const LIVE_WS_BASE = 'wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1beta.GenerativeService.BidiGenerateContentConstrained';
   let liveSocket = null;
   let mediaStream = null;
