@@ -1,22 +1,525 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>HAVEN — Websites Built for Your Vision</title>
-    <meta name="description" content="Premium website-building and digital experience studio. Explore bespoke templates, custom craft, and cinematic web design." />
-    <meta property="og:title" content="HAVEN — Websites Built for Your Vision" />
-    <meta property="og:description" content="Premium website-building and digital experience studio. Explore bespoke templates, custom craft, and cinematic web design." />
-    <meta property="og:type" content="website" />
-    <meta name="twitter:card" content="summary_large_image" />
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Syne:wght@500;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%230f0728'/><path d='M8 22V10h3.5l4.5 7.5L20.5 10H24v12h-3v-7l-4.5 7.5h-1L11 15v7H8z' fill='%23c084fc'/></svg>" />
-  </head>
-  <body class="bg-[#06040b] text-[#f1f1f6] antialiased selection:bg-purple-600 selection:text-white">
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
-</html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HAVEN — Websites Built for Your Vision</title>
+  <meta name="description" content="HAVEN is a boutique digital studio building bespoke, cinematic web experiences, iconic visual identities, and high-performance digital presence.">
+  <link rel="icon" type="image/png" href="favicon.png">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
 
+  <!-- =========================================================================
+       NAVIGATION
+       ========================================================================= -->
+  <header class="site-header">
+    <div class="container">
+      <nav class="nav-wrap">
+        <a href="index.html" class="nav-brand">
+          <div class="brand-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+            </svg>
+          </div>
+          <span>HAVEN</span>
+        </a>
+
+        <ul class="nav-menu">
+          <li><a href="index.html" class="nav-link active">Home</a></li>
+          <li><a href="templates.html" class="nav-link">Templates</a></li>
+          <li><a href="services.html" class="nav-link">Services</a></li>
+          <li><a href="pricing.html" class="nav-link">Pricing</a></li>
+          <li><a href="about.html" class="nav-link">About</a></li>
+          <li><a href="ai.html" class="nav-link">HAVEN AI</a></li>
+          <li><a href="contact.html" class="nav-link">Contact</a></li>
+        </ul>
+
+        <div class="nav-actions">
+          <a href="contact.html" class="btn btn-primary btn-sm">Get Started</a>
+          <button class="nav-toggle" aria-label="Toggle navigation menu">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="3" y1="12" x2="21" y2="12"></line>
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <!-- =========================================================================
+       HERO SECTION
+       ========================================================================= -->
+  <section class="hero-section">
+    <div class="container">
+      <div class="hero-grid">
+        
+        <div class="hero-content reveal">
+          <div class="eyebrow">
+            <span class="eyebrow-dot"></span>
+            WEBSITE BUILDING • DESIGN • BRANDING
+          </div>
+          
+          <h1 class="hero-title">
+            WEBSITES BUILT<br>
+            FOR<br>
+            <span class="gradient-text">YOUR VISION.</span>
+          </h1>
+
+          <p class="lead-text">
+            HAVEN designs and constructs cinematic, ultra-fast digital experiences. 
+            From turnkey studio templates to bespoke digital architecture, we forge 
+            websites that command attention and elevate your brand.
+          </p>
+
+          <div class="hero-cta-group">
+            <a href="templates.html" class="btn btn-primary btn-lg">Explore Templates</a>
+            <a href="contact.html" class="btn btn-secondary btn-lg">Build With HAVEN</a>
+          </div>
+
+          <div class="hero-trust">
+            <div class="trust-item">
+              <span class="trust-number">100%</span>
+              <span class="trust-label">Static & Fast</span>
+            </div>
+            <div class="trust-item">
+              <span class="trust-number">0.3s</span>
+              <span class="trust-label">Global TTFB</span>
+            </div>
+            <div class="trust-item">
+              <span class="trust-number">Bespoke</span>
+              <span class="trust-label">Tailored Craft</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- CINEMATIC INTERACTIVE NIGHT / DAY SPLIT VIEWER WITH WOLF -->
+        <div class="hero-visual reveal">
+          <div class="split-viewer-card" aria-label="Interactive Night and Day Wolf Sanctuary Showcase">
+            <!-- Floating instructions badge -->
+            <div class="split-instructions">
+              <span class="pulse-indicator"></span>
+              <span>Drag or hover to reveal Night & Day</span>
+            </div>
+
+            <!-- Layer 1: Night Wolf (Base Layer) -->
+            <div class="split-layer split-layer-night">
+              <div class="stars-overlay"></div>
+              <div class="mist-overlay"></div>
+              <img class="hero-wolf-img" src="assets/hero.webp" alt="Cinematic HAVEN Charcoal Wolf on alpine ridge under deep purple starry night" loading="eager" referrerpolicy="no-referrer">
+              <div class="wolf-atmosphere-glow"></div>
+              <span class="split-badge split-badge-night">
+                <span class="badge-icon">☾</span> Night Vision
+              </span>
+            </div>
+
+            <!-- Layer 2: Day Environment (Clipped Overlay) -->
+            <div class="split-layer split-layer-day">
+              <div class="sun-glare-overlay"></div>
+              <img class="hero-day-img" src="assets/hero-day.webp" alt="HAVEN Sunlit Mountain Valley and Architectural City" loading="eager" referrerpolicy="no-referrer">
+              <span class="split-badge split-badge-day">
+                <span class="badge-icon">☼</span> Daylight
+              </span>
+            </div>
+
+            <!-- Visible thin purple transition line & draggable handle -->
+            <div class="split-divider-line" aria-hidden="true"></div>
+            <div class="split-handle" tabindex="0" role="slider" aria-valuenow="50" aria-valuemin="5" aria-valuemax="95" aria-label="Night and Day transition slider" title="Drag to compare Day & Night views">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="15 18 9 12 15 6"></polyline>
+                <polyline points="9 18 3 12 9 6"></polyline>
+              </svg>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================================================================
+       1. WHAT HAVEN DOES
+       ========================================================================= -->
+  <section class="section">
+    <div class="container">
+      <div class="section-header text-center reveal">
+        <div class="eyebrow">
+          <span class="eyebrow-dot"></span>
+          STUDIO CAPABILITIES
+        </div>
+        <h2 class="section-title">What HAVEN Does</h2>
+        <p class="lead-text">
+          We combine sculptural aesthetics, relentless performance engineering, and strategic conversion to bring visionary concepts into reality.
+        </p>
+      </div>
+
+      <div class="pillars-grid">
+        
+        <div class="pillar-card reveal">
+          <div class="pillar-icon-box">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+              <polyline points="2 17 12 22 22 17"></polyline>
+              <polyline points="2 12 12 17 22 12"></polyline>
+            </svg>
+          </div>
+          <h3 class="pillar-title">Web Architecture</h3>
+          <p class="pillar-desc">
+            Ultra-clean, standards-compliant static and full-stack sites with instant page loads, flawless mobile responsiveness, and zero bloated runtimes.
+          </p>
+        </div>
+
+        <div class="pillar-card reveal">
+          <div class="pillar-icon-box">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"></path>
+              <path d="M2 12h20"></path>
+            </svg>
+          </div>
+          <h3 class="pillar-title">Cinematic Art Direction</h3>
+          <p class="pillar-desc">
+            Distinctive visual universes, custom palettes, dark-mode mastery, and atmospheric micro-animations designed to captivate your highest-value clients.
+          </p>
+        </div>
+
+        <div class="pillar-card reveal">
+          <div class="pillar-icon-box">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path>
+            </svg>
+          </div>
+          <h3 class="pillar-title">Branding & Growth</h3>
+          <p class="pillar-desc">
+            Strategic typography, conversion-driven editorial hierarchy, and seamless lead generation funnels that transform curious visitors into loyal advocates.
+          </p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================================================================
+       2. SELECTED TEMPLATES
+       ========================================================================= -->
+  <section class="section" style="background: rgba(14, 10, 28, 0.35);">
+    <div class="container">
+      <div class="section-header text-center reveal">
+        <div class="eyebrow">
+          <span class="eyebrow-dot"></span>
+          CURATED COLLECTION
+        </div>
+        <h2 class="section-title">Selected Templates</h2>
+        <p class="lead-text">
+          Precision-crafted design systems ready for immediate deployment or custom tailored by the HAVEN team.
+        </p>
+      </div>
+
+      <div class="templates-grid">
+
+        <!-- NEXUS -->
+        <div class="template-card reveal">
+          <div class="template-media">
+            <img src="assets/nexus.webp" alt="NEXUS Esports &amp; Gaming System" loading="lazy">
+            <span class="template-badge">6-Page System</span>
+          </div>
+          <div class="template-body">
+            <div class="template-meta">
+              <h3 class="template-name">NEXUS</h3>
+              <span class="template-category">Esports &bull; Gaming</span>
+            </div>
+            <p class="template-desc">
+              High-octane esports organization and tournament platform featuring live bracket trackers, verified player rosters, and game division directories.
+            </p>
+            <div class="template-pricing-row">
+              <span class="pricing-label">Starting Price</span>
+              <span class="pricing-val">PKR 29,000 <span class="pricing-sub">(or $890 USD)</span></span>
+            </div>
+            <div class="template-actions">
+              <a href="templates/nexus.html" class="btn btn-secondary btn-sm">View Demo</a>
+              <a href="contact.html?template=NEXUS" class="btn btn-primary btn-sm">Get This Template</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- VINTAGE -->
+        <div class="template-card reveal">
+          <div class="template-media">
+            <img src="assets/vintage.webp" alt="VINTAGE Fine Dining Template" loading="lazy">
+            <span class="template-badge">6-Page System</span>
+          </div>
+          <div class="template-body">
+            <div class="template-meta">
+              <h3 class="template-name">VINTAGE</h3>
+              <span class="template-category">Fine Dining &bull; Hearth</span>
+            </div>
+            <p class="template-desc">
+              Warm artisanal hospitality website featuring wood-fired seasonal tasting menus, natural wine cellar reserves, atmosphere gallery, and table bookings.
+            </p>
+            <div class="template-pricing-row">
+              <span class="pricing-label">Starting Price</span>
+              <span class="pricing-val">PKR 29,000 <span class="pricing-sub">(or $890 USD)</span></span>
+            </div>
+            <div class="template-actions">
+              <a href="templates/vintage.html" class="btn btn-secondary btn-sm">View Demo</a>
+              <a href="contact.html?template=VINTAGE" class="btn btn-primary btn-sm">Get This Template</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- LUMI -->
+        <div class="template-card reveal">
+          <div class="template-media">
+            <img src="assets/lumi.webp" alt="LUMI Creative Studio Template" loading="lazy">
+            <span class="template-badge">6-Page System</span>
+          </div>
+          <div class="template-body">
+            <div class="template-meta">
+              <h3 class="template-name">LUMI</h3>
+              <span class="template-category">Spatial &bull; Identity</span>
+            </div>
+            <p class="template-desc">
+              Avant-garde creative direction and spatial studio layout with generous whitespace, minimalist framing, expansive case studies, and critical essays.
+            </p>
+            <div class="template-pricing-row">
+              <span class="pricing-label">Starting Price</span>
+              <span class="pricing-val">PKR 29,000 <span class="pricing-sub">(or $890 USD)</span></span>
+            </div>
+            <div class="template-actions">
+              <a href="templates/lumi.html" class="btn btn-secondary btn-sm">View Demo</a>
+              <a href="contact.html?template=LUMI" class="btn btn-primary btn-sm">Get This Template</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- ORBIT -->
+        <div class="template-card reveal">
+          <div class="template-media">
+            <img src="assets/orbit.webp" alt="ORBIT Deep Tech &amp; SaaS Template" loading="lazy">
+            <span class="template-badge">6-Page System</span>
+          </div>
+          <div class="template-body">
+            <div class="template-meta">
+              <h3 class="template-name">ORBIT</h3>
+              <span class="template-category">Deep Tech &bull; SaaS</span>
+            </div>
+            <p class="template-desc">
+              Developer-first vector database and edge inference platform with terminal quickstarts, performance benchmarks, and transparent tier pricing.
+            </p>
+            <div class="template-pricing-row">
+              <span class="pricing-label">Starting Price</span>
+              <span class="pricing-val">PKR 29,000 <span class="pricing-sub">(or $890 USD)</span></span>
+            </div>
+            <div class="template-actions">
+              <a href="templates/orbit.html" class="btn btn-secondary btn-sm">View Demo</a>
+              <a href="contact.html?template=ORBIT" class="btn btn-primary btn-sm">Get This Template</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- NOVA -->
+        <div class="template-card reveal">
+          <div class="template-media">
+            <img src="assets/nova.webp" alt="NOVA Corporate Advisory Template" loading="lazy">
+            <span class="template-badge">6-Page System</span>
+          </div>
+          <div class="template-body">
+            <div class="template-meta">
+              <h3 class="template-name">NOVA</h3>
+              <span class="template-category">Corporate &bull; M&amp;A</span>
+            </div>
+            <p class="template-desc">
+              Data-backed corporate presentation and strategic advisory platform emphasizing cross-border M&amp;A, fiduciary governance, and partner leadership.
+            </p>
+            <div class="template-pricing-row">
+              <span class="pricing-label">Starting Price</span>
+              <span class="pricing-val">PKR 29,000 <span class="pricing-sub">(or $890 USD)</span></span>
+            </div>
+            <div class="template-actions">
+              <a href="templates/nova.html" class="btn btn-secondary btn-sm">View Demo</a>
+              <a href="contact.html?template=NOVA" class="btn btn-primary btn-sm">Get This Template</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- MONARCH -->
+        <div class="template-card reveal">
+          <div class="template-media">
+            <img src="assets/monarch.webp" alt="MONARCH Executive Personal Brand Template" loading="lazy">
+            <span class="template-badge">6-Page System</span>
+          </div>
+          <div class="template-body">
+            <div class="template-meta">
+              <h3 class="template-name">MONARCH</h3>
+              <span class="template-category">Executive &bull; Brand</span>
+            </div>
+            <p class="template-desc">
+              Commanding personal brand and board advisory showcase built for executive chairs, authors, and keynote speakers with private office inquiries.
+            </p>
+            <div class="template-pricing-row">
+              <span class="pricing-label">Starting Price</span>
+              <span class="pricing-val">PKR 29,000 <span class="pricing-sub">(or $890 USD)</span></span>
+            </div>
+            <div class="template-actions">
+              <a href="templates/monarch.html" class="btn btn-secondary btn-sm">View Demo</a>
+              <a href="contact.html?template=MONARCH" class="btn btn-primary btn-sm">Get This Template</a>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="text-center" style="margin-top: 3.5rem;">
+        <a href="templates.html" class="btn btn-secondary">View All Templates &amp; Specifications →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================================================================
+       3. SIMPLE 3-STEP PROCESS
+       ========================================================================= -->
+  <section class="section">
+    <div class="container">
+      <div class="section-header text-center reveal">
+        <div class="eyebrow">
+          <span class="eyebrow-dot"></span>
+          TRANSPARENT WORKFLOW
+        </div>
+        <h2 class="section-title">Simple 3-Step Process</h2>
+        <p class="lead-text">
+          No endless revisions or opaque timelines. We move swiftly from initial vision to a world-class production launch.
+        </p>
+      </div>
+
+      <div class="process-grid">
+
+        <div class="process-card reveal">
+          <div class="process-number">01</div>
+          <h3 class="process-title">Vision &amp; Blueprint</h3>
+          <p class="process-desc">
+            We analyze your brand, select or customize the perfect aesthetic foundation, and map out your content architecture in hours, not weeks.
+          </p>
+        </div>
+
+        <div class="process-card reveal">
+          <div class="process-number">02</div>
+          <h3 class="process-title">Design &amp; Precision Code</h3>
+          <p class="process-desc">
+            Our engineers build your website with pristine static markup, smooth cinematic motion, and uncompromising attention to typography and mobile viewports.
+          </p>
+        </div>
+
+        <div class="process-card reveal">
+          <div class="process-number">03</div>
+          <h3 class="process-title">Launch &amp; Elevate</h3>
+          <p class="process-desc">
+            We deploy directly to global edge CDNs (GitHub Pages, Cloudflare, or your custom domain) for sub-second delivery with zero ongoing maintenance headaches.
+          </p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================================================================
+       4. FINAL CTA
+       ========================================================================= -->
+  <section class="section" style="padding-bottom: 7rem;">
+    <div class="container">
+      <div class="cta-banner reveal">
+        <div class="eyebrow">
+          <span class="eyebrow-dot"></span>
+          GET STARTED TODAY
+        </div>
+        <h2 class="cta-title">Ready to bring your digital <br><span class="gradient-text">vision to life?</span></h2>
+        <p class="lead-text" style="margin-left: auto; margin-right: auto;">
+          Whether you want a turnkey template setup or a fully custom flagship experience, HAVEN is ready to craft your next masterpiece.
+        </p>
+        <div class="cta-buttons">
+          <a href="contact.html" class="btn btn-primary btn-lg">Build With HAVEN</a>
+          <a href="templates.html" class="btn btn-secondary btn-lg">Browse Templates</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================================================================
+       5. FOOTER
+       ========================================================================= -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        
+        <div>
+          <a href="index.html" class="nav-brand">
+            <div class="brand-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+              </svg>
+            </div>
+            <span>HAVEN</span>
+          </a>
+          <p class="footer-brand-desc">
+            Websites built for your vision. Dark cinematic aesthetics, uncompromising speed, and bespoke digital craftsmanship.
+          </p>
+        </div>
+
+        <div>
+          <h4 class="footer-col-title">Navigation</h4>
+          <ul class="footer-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="templates.html">Templates</a></li>
+            <li><a href="services.html">Services</a></li>
+            <li><a href="pricing.html">Pricing</a></li>
+            <li><a href="about.html">About</a></li>
+            <li><a href="ai.html">HAVEN AI</a></li>
+            <li><a href="contact.html">Contact</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 class="footer-col-title">Templates</h4>
+          <ul class="footer-links">
+            <li><a href="templates/nexus.html">Nexus (Gaming)</a></li>
+            <li><a href="templates/vintage.html">Vintage (Restaurant)</a></li>
+            <li><a href="templates/lumi.html">Lumi (Creative)</a></li>
+            <li><a href="templates/orbit.html">Orbit (Technology)</a></li>
+            <li><a href="templates/nova.html">Nova (Business)</a></li>
+            <li><a href="templates/monarch.html">Monarch (Professional)</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 class="footer-col-title">Legal &amp; Studio</h4>
+          <ul class="footer-links">
+            <li><a href="privacy.html">Privacy Policy</a></li>
+            <li><a href="terms.html">Terms of Service</a></li>
+            <li><a href="contact.html">Project Enquiry</a></li>
+            <li><a href="about.html#wolf">The Wolf Philosophy</a></li>
+          </ul>
+        </div>
+
+      </div>
+
+      <div class="footer-bottom">
+        <p>&copy; 2026 HAVEN Digital Studio. All rights reserved.</p>
+        <div class="footer-bottom-links">
+          <a href="privacy.html">Privacy</a>
+          <a href="terms.html">Terms</a>
+          <a href="contact.html">Support</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- FLOATING HAVEN AI BADGE -->
+  <a href="ai.html" class="floating-ai-btn" aria-label="Open HAVEN AI Voice Assistant" title="Consult HAVEN AI">
+    <span class="ai-sparkle">✦</span>
+    <span>HAVEN AI</span>
+  </a>
+
+  <script src="script.js" defer></script>
+</body>
+</html>
