@@ -450,14 +450,12 @@ function initHavenAI() {
   const sendEnquiryBtn = document.getElementById('send-enquiry-btn');
   const newConsultationBtn = document.getElementById('new-consultation-btn');
 
-  // Pill Elements
   const valName = document.getElementById('val-name');
   const valBiz = document.getElementById('val-biz');
   const valType = document.getElementById('val-type');
   const valTemplate = document.getElementById('val-template');
   const valBudget = document.getElementById('val-budget');
 
-  // Summary Elements
   const sumClient = document.getElementById('sum-client');
   const sumEmail = document.getElementById('sum-email');
   const sumBrand = document.getElementById('sum-brand');
@@ -470,571 +468,388 @@ function initHavenAI() {
   const sumNotesBox = document.getElementById('sum-additional-box');
   const successRefId = document.getElementById('success-ref-id');
 
-  // State
   let isListening = false;
   let isSpeaking = false;
   let isThinking = false;
   let isMuted = false;
   let conversationHistory = [];
   let projectState = {
-    name: '',
-    email: '',
-    phone: '',
-    businessName: '',
-    country: '',
-    city: '',
-    businessType: '',
-    websiteType: '',
-    projectType: '',
-    template: '',
-    pages: [],
-    features: [],
-    hosting: '',
-    domain: '',
-    budget: '',
-    timeline: '',
-    stylePreferences: '',
-    brandColors: '',
-    existingWebsite: '',
-    referenceWebsites: '',
-    additionalRequirements: ''
+    name: '', email: '', phone: '', businessName: '', country: '', city: '',
+    businessType: '', websiteType: '', projectType: '', template: '', pages: [],
+    features: [], hosting: '', domain: '', budget: '', timeline: '',
+    stylePreferences: '', brandColors: '', existingWebsite: '',
+    referenceWebsites: '', additionalRequirements: ''
   };
 
   const API_BASE_URL = (window.HAVEN_API_BASE_URL || '').replace(/\/$/, '');
+  const LIVE_WS_BASE = 'wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1beta.GenerativeService.BidiGenerateContentConstrained';
+  let liveSocket = null;
+  let mediaStream = null;
+  let audioContext = null;
+  let sourceNode = null;
+  let processorNode = null;
+  let playbackContext = null;
+  let playbackCursor = 0;
+  let liveConnected = false;
+  let liveUserTranscript = '';
+  let liveAssistantTranscript = '';
 
-  // Speech Recognition Setup
-  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition || null;
-  let recognition = null;
-
-  if (SpeechRecognition) {
-    try {
-      recognition = new SpeechRecognition();
-      recognition.continuous = false;
-      recognition.interimResults = false;
-      recognition.lang = 'en-US';
-
-      recognition.onstart = () => {
-        isListening = true;
-        setVoiceState('listening');
-      };
-
-      recognition.onresult = (event) => {
-        const transcript = event.results[0][0].transcript;
-        if (transcript && transcript.trim()) {
-          sendMessage(transcript.trim());
-        }
-      };
-
-      recognition.onerror = (event) => {
-        console.warn('[HAVEN AI] Speech recognition error:', event.error);
-        isListening = false;
-        if (event.error === 'not-allowed') {
-          setVoiceState('error', 'Microphone permission denied. You can continue by typing.');
-        } else {
-          setVoiceState('idle');
-        }
-      };
-
-      recognition.onend = () => {
-        isListening = false;
-        if (!isThinking && !isSpeaking) {
-          setVoiceState('idle');
-        }
-      };
-    } catch (e) {
-      console.warn('[HAVEN AI] Speech recognition initialization failed:', e);
-    }
-  }
-
-  // Voice State Visualizer
   function setVoiceState(state, customMessage) {
     if (!orb || !statusText || !liveStatus) return;
-
     orb.className = 'ai-orb-wrap ' + (state === 'idle' ? '' : state);
     liveStatus.className = 'ai-live-indicator ' + (state === 'idle' ? '' : state);
-
-    if (micBtn) {
-      if (state === 'listening') {
-        micBtn.classList.add('active-listening');
-      } else {
-        micBtn.classList.remove('active-listening');
-      }
-    }
-
-    if (stopSpeakingBtn) {
-      stopSpeakingBtn.style.display = (state === 'speaking') ? 'inline-flex' : 'none';
-    }
-
-    switch (state) {
-      case 'listening':
-        statusText.textContent = customMessage || 'Listening...';
-        break;
-      case 'thinking':
-        statusText.textContent = customMessage || 'Thinking...';
-        break;
-      case 'speaking':
-        statusText.textContent = customMessage || 'HAVEN AI is speaking...';
-        break;
-      case 'error':
-        statusText.textContent = customMessage || 'Voice isn\'t available right now. You can continue by typing.';
-        break;
-      case 'idle':
-      default:
-        statusText.textContent = customMessage || '● Ready';
-        break;
-    }
+    if (micBtn) micBtn.classList.toggle('active-listening', state === 'listening');
+    if (stopSpeakingBtn) stopSpeakingBtn.style.display = state === 'speaking' ? 'inline-flex' : 'none';
+    const messages = {
+      listening: 'Listening...', thinking: 'Thinking...', speaking: 'HAVEN AI is speaking...',
+      error: 'Voice isn\'t available right now. You can continue by typing.', idle: '● Ready'
+    };
+    statusText.textContent = customMessage || messages[state] || messages.idle;
   }
 
-  // Speech Synthesis Helper
-  function speakResponse(text, lang) {
-    if (!('speechSynthesis' in window) || isMuted) {
-      setVoiceState('idle');
-      return;
-    }
-
-    window.speechSynthesis.cancel();
-
-    // Clean plain text without markdown or symbols
-    const cleanText = text.replace(/[*#`_~[\]]/g, '').trim();
-    if (!cleanText) return;
-
-    const utterance = new SpeechSynthesisUtterance(cleanText);
-    utterance.rate = 1.0;
-    utterance.pitch = 1.0;
-
-    // Detect language code
-    if (lang === 'ur') {
-      utterance.lang = 'ur-PK';
-    } else if (lang === 'hi') {
-      utterance.lang = 'hi-IN';
-    } else if (lang === 'ar') {
-      utterance.lang = 'ar-SA';
-    } else {
-      utterance.lang = 'en-US';
-    }
-
-    // Try finding natural sounding voice
-    const voices = window.speechSynthesis.getVoices();
-    if (voices.length > 0) {
-      const match = voices.find(v => v.lang.startsWith(utterance.lang.slice(0, 2)) && (v.name.includes('Natural') || v.name.includes('Google') || v.name.includes('Premium')));
-      if (match) utterance.voice = match;
-    }
-
-    utterance.onstart = () => {
-      isSpeaking = true;
-      setVoiceState('speaking');
-    };
-
-    utterance.onend = () => {
-      isSpeaking = false;
-      setVoiceState('idle');
-    };
-
-    utterance.onerror = () => {
-      isSpeaking = false;
-      setVoiceState('idle');
-    };
-
-    window.speechSynthesis.speak(utterance);
-  }
-
-  function stopSpeaking() {
-    if ('speechSynthesis' in window) {
-      window.speechSynthesis.cancel();
-    }
-    isSpeaking = false;
-    setVoiceState('idle');
-  }
-
-  // Render chat bubble in conversation thread
   function appendMessage(role, text) {
-    if (!thread) return;
+    if (!thread || !text) return;
     const bubble = document.createElement('div');
     bubble.className = `ai-chat-bubble ${role === 'user' ? 'user' : 'assistant'}`;
-
     const author = document.createElement('div');
     author.className = 'chat-bubble-author';
-
-    if (role === 'user') {
-      author.innerHTML = `You`;
-    } else {
-      author.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="10"></circle></svg> HAVEN AI &bull; Project Consultant`;
-    }
-
+    author.innerHTML = role === 'user' ? 'You' : `<svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="10"></circle></svg> HAVEN AI &bull; Project Consultant`;
     const content = document.createElement('div');
     content.className = 'chat-bubble-text';
     content.textContent = text;
-
-    bubble.appendChild(author);
-    bubble.appendChild(content);
-    thread.appendChild(bubble);
-
-    // Smooth scroll to bottom
+    bubble.appendChild(author); bubble.appendChild(content); thread.appendChild(bubble);
     thread.scrollTop = thread.scrollHeight;
   }
 
-  // Update live progress bar pills
   function updateProgressPills(state) {
     if (!state) return;
-    if (valName && state.name) {
-      valName.textContent = state.name;
-      valName.parentElement.classList.add('filled');
-    }
-    if (valBiz && state.businessName) {
-      valBiz.textContent = state.businessName;
-      valBiz.parentElement.classList.add('filled');
-    }
-    if (valType && (state.websiteType || state.businessType)) {
-      valType.textContent = state.websiteType || state.businessType;
-      valType.parentElement.classList.add('filled');
-    }
-    if (valTemplate && state.template) {
-      valTemplate.textContent = state.template;
-      valTemplate.parentElement.classList.add('filled');
-    }
-    if (valBudget && state.budget) {
-      valBudget.textContent = state.budget;
-      valBudget.parentElement.classList.add('filled');
-    }
+    if (valName && state.name) { valName.textContent = state.name; valName.parentElement.classList.add('filled'); }
+    if (valBiz && state.businessName) { valBiz.textContent = state.businessName; valBiz.parentElement.classList.add('filled'); }
+    if (valType && (state.websiteType || state.businessType)) { valType.textContent = state.websiteType || state.businessType; valType.parentElement.classList.add('filled'); }
+    if (valTemplate && state.template) { valTemplate.textContent = state.template; valTemplate.parentElement.classList.add('filled'); }
+    if (valBudget && state.budget) { valBudget.textContent = state.budget; valBudget.parentElement.classList.add('filled'); }
   }
 
-  // Populate Project Summary Review Card
   function renderSummaryCard(state) {
     if (!summaryBox) return;
-
     if (sumClient) sumClient.textContent = state.name || 'Not provided yet';
     if (sumEmail) sumEmail.textContent = state.email || 'Required for confirmation';
     if (sumBrand) sumBrand.textContent = state.businessName || 'Bespoke Brand';
     if (sumBizType) sumBizType.textContent = state.businessType || state.websiteType || 'Custom Venture';
     if (sumTemplate) sumTemplate.textContent = state.template || 'Custom Bespoke Scope';
-    
-    if (sumPages) {
-      sumPages.textContent = Array.isArray(state.pages) && state.pages.length ? state.pages.join(', ') : 'Standard 6-Page Suite';
-    }
-    if (sumFeatures) {
-      sumFeatures.textContent = Array.isArray(state.features) && state.features.length ? state.features.join(', ') : 'Turnkey responsive setup';
-    }
+    if (sumPages) sumPages.textContent = Array.isArray(state.pages) && state.pages.length ? state.pages.join(', ') : 'Standard 6-Page Suite';
+    if (sumFeatures) sumFeatures.textContent = Array.isArray(state.features) && state.features.length ? state.features.join(', ') : 'Turnkey responsive setup';
     if (sumBudget) sumBudget.textContent = state.budget || 'Starting from PKR 29,000';
-
-    if (state.additionalRequirements && sumNotes && sumNotesBox) {
-      sumNotes.textContent = state.additionalRequirements;
-      sumNotesBox.style.display = 'block';
-    }
-
+    if (state.additionalRequirements && sumNotes && sumNotesBox) { sumNotes.textContent = state.additionalRequirements; sumNotesBox.style.display = 'block'; }
     summaryBox.classList.add('active');
     summaryBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }
 
-  // Send Message to backend
+  function cleanSpeechText(text) { return String(text || '').replace(/[*#`_~[\]]/g, '').trim(); }
+
+  function speakResponse(text, lang) {
+    if (!('speechSynthesis' in window) || isMuted) { setVoiceState('idle'); return; }
+    const cleanText = cleanSpeechText(text);
+    if (!cleanText) return;
+    window.speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(cleanText);
+    utterance.rate = 1; utterance.pitch = 1;
+    utterance.lang = lang === 'ur' ? 'ur-PK' : lang === 'hi' ? 'hi-IN' : lang === 'ar' ? 'ar-SA' : 'en-US';
+    const voices = window.speechSynthesis.getVoices();
+    const match = voices.find(v => v.lang && v.lang.toLowerCase().startsWith(utterance.lang.slice(0, 2)) && /Natural|Google|Premium/i.test(v.name));
+    if (match) utterance.voice = match;
+    utterance.onstart = () => { isSpeaking = true; setVoiceState('speaking'); };
+    utterance.onend = () => { isSpeaking = false; setVoiceState('idle'); };
+    utterance.onerror = () => { isSpeaking = false; setVoiceState('idle'); };
+    window.speechSynthesis.speak(utterance);
+  }
+
+  function stopSpeaking() {
+    if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+    isSpeaking = false;
+    if (liveSocket && liveConnected) {
+      try { liveSocket.send(JSON.stringify({ realtimeInput: { activityEnd: {} } })); } catch (_) {}
+    }
+    setVoiceState('idle');
+  }
+
   async function sendMessage(text) {
     if (!text || isThinking) return;
-
-    // Interrupt any active voice synthesis
     stopSpeaking();
-
-    // Append to UI
     appendMessage('user', text);
     conversationHistory.push({ role: 'user', text });
-
     if (textInput) textInput.value = '';
-
-    // Set Thinking state
-    isThinking = true;
-    setVoiceState('thinking');
-
+    isThinking = true; setVoiceState('thinking');
     try {
       const response = await fetch(`${API_BASE_URL}/api/chat`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          message: text,
-          history: conversationHistory,
-          projectState: projectState
-        })
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: text, history: conversationHistory, projectState })
       });
-
-      if (!response.ok) {
-        throw new Error('API server returned status ' + response.status);
-      }
-
-      const data = await response.json();
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(data.error || `API server returned status ${response.status}`);
       isThinking = false;
-
-      const aiReply = data.reply || "I understand your vision. Let's continue shaping your project.";
-      
-      // Update history and state
+      const aiReply = data.reply || 'I understand your vision. Let\'s continue shaping your project.';
       conversationHistory.push({ role: 'model', text: aiReply });
-      if (data.projectState) {
-        projectState = { ...projectState, ...data.projectState };
-        updateProgressPills(projectState);
-      }
-
-      // Update language indicator
-      if (langPill && data.detectedLanguage) {
-        langPill.textContent = data.detectedLanguage.toUpperCase();
-      }
-
+      if (data.projectState) { projectState = { ...projectState, ...data.projectState }; updateProgressPills(projectState); }
+      if (langPill && data.detectedLanguage) langPill.textContent = data.detectedLanguage.toUpperCase();
       appendMessage('assistant', aiReply);
-
-      // Speak response if not muted
       speakResponse(aiReply, data.detectedLanguage);
-
-      // Check if ready to display summary
-      if (data.isReadyForSummary) {
-        renderSummaryCard(projectState);
-      }
-
+      if (data.isReadyForSummary) renderSummaryCard(projectState);
     } catch (err) {
       console.error('[HAVEN AI] Chat communication failed:', err);
       isThinking = false;
-      const errorMsg = "I'm having trouble connecting right now. You can continue by typing or use the HAVEN contact page.";
+      const errorMsg = 'I\'m having trouble connecting right now. Please try again in a moment.';
       appendMessage('assistant', errorMsg);
       setVoiceState('error', errorMsg);
     }
   }
 
-  // Toggle Microphone
-  function toggleMicrophone() {
-    if (!recognition) {
-      setVoiceState('error', 'Voice recognition is not supported in this browser. Please type below.');
-      if (textInput) textInput.focus();
+  function arrayBufferToBase64(buffer) {
+    const bytes = new Uint8Array(buffer); let binary = '';
+    const chunk = 0x8000;
+    for (let i = 0; i < bytes.length; i += chunk) binary += String.fromCharCode(...bytes.subarray(i, i + chunk));
+    return btoa(binary);
+  }
+
+  function floatTo16BitPCM(float32) {
+    const out = new Int16Array(float32.length);
+    for (let i = 0; i < float32.length; i++) {
+      const s = Math.max(-1, Math.min(1, float32[i]));
+      out[i] = s < 0 ? s * 0x8000 : s * 0x7fff;
+    }
+    return out.buffer;
+  }
+
+  function downsampleTo16k(buffer, inputRate) {
+    if (inputRate === 16000) return buffer;
+    const ratio = inputRate / 16000;
+    const newLength = Math.round(buffer.length / ratio);
+    const result = new Float32Array(newLength);
+    let offset = 0;
+    for (let i = 0; i < newLength; i++) {
+      const next = Math.round((i + 1) * ratio);
+      let sum = 0, count = 0;
+      for (let j = offset; j < next && j < buffer.length; j++) { sum += buffer[j]; count++; }
+      result[i] = count ? sum / count : 0;
+      offset = next;
+    }
+    return result;
+  }
+
+  function playPcm24k(base64) {
+    if (isMuted || !base64) return;
+    try {
+      const binary = atob(base64);
+      const pcm = new Int16Array(binary.length / 2);
+      for (let i = 0; i < pcm.length; i++) pcm[i] = (binary.charCodeAt(i * 2) & 255) | (binary.charCodeAt(i * 2 + 1) << 8);
+      if (!playbackContext) playbackContext = new (window.AudioContext || window.webkitAudioContext)({ sampleRate: 24000 });
+      const ctx = playbackContext;
+      const audio = ctx.createBuffer(1, pcm.length, 24000);
+      const channel = audio.getChannelData(0);
+      for (let i = 0; i < pcm.length; i++) channel[i] = pcm[i] / 32768;
+      const source = ctx.createBufferSource(); source.buffer = audio; source.connect(ctx.destination);
+      const now = ctx.currentTime;
+      playbackCursor = Math.max(playbackCursor, now);
+      source.start(playbackCursor);
+      playbackCursor += audio.duration;
+      isSpeaking = true; setVoiceState('speaking');
+      source.onended = () => { if (playbackCursor <= ctx.currentTime + 0.05) { isSpeaking = false; setVoiceState('idle'); } };
+    } catch (err) { console.warn('[HAVEN AI] Audio playback failed:', err); }
+  }
+
+  async function updateProjectFromVoiceTranscript(text) {
+    if (!text || text.length < 2) return;
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/chat`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: text, history: conversationHistory, projectState })
+      });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) return;
+      if (data.projectState) { projectState = { ...projectState, ...data.projectState }; updateProgressPills(projectState); }
+      if (data.isReadyForSummary) renderSummaryCard(projectState);
+      if (data.detectedLanguage && langPill) langPill.textContent = data.detectedLanguage.toUpperCase();
+    } catch (err) { console.warn('[HAVEN AI] Voice project-state sync failed:', err); }
+  }
+
+  async function startLiveVoice() {
+    if (!navigator.mediaDevices?.getUserMedia) {
+      setVoiceState('error', 'Your browser does not support microphone access. Please continue by typing.');
       return;
     }
+    if (liveConnected) return;
+    try {
+      setVoiceState('thinking', 'Connecting to HAVEN AI...');
+      const tokenResponse = await fetch(`${API_BASE_URL}/api/live-token`, { method: 'POST', headers: { 'Content-Type': 'application/json' } });
+      const tokenData = await tokenResponse.json().catch(() => ({}));
+      if (!tokenResponse.ok || !tokenData.token) throw new Error(tokenData.error || 'Could not create Live API token.');
 
-    // If AI is currently speaking, clicking mic interrupts it and begins listening
-    if (isSpeaking) {
-      stopSpeaking();
-    }
+      mediaStream = await navigator.mediaDevices.getUserMedia({ audio: { channelCount: 1, echoCancellation: true, noiseSuppression: true, autoGainControl: true } });
+      liveSocket = new WebSocket(`${LIVE_WS_BASE}?access_token=${encodeURIComponent(tokenData.token)}`);
 
-    if (isListening) {
-      recognition.stop();
-      isListening = false;
-      setVoiceState('idle');
-    } else {
-      try {
-        recognition.start();
-      } catch (err) {
-        console.warn('[HAVEN AI] Recognition start error:', err);
-        recognition.stop();
-        setTimeout(() => {
-          try { recognition.start(); } catch (_) {}
-        }, 150);
-      }
+      liveSocket.onopen = async () => {
+        liveConnected = true;
+        setVoiceState('listening', 'Listening...');
+        const system = `You are HAVEN AI, a professional digital project consultant for HAVEN. Be warm, concise, natural and useful. Never say you are a generic AI. Mirror the user's language. Discuss HAVEN's real website services, templates and starting prices. Do not invent awards, clients or statistics. Current project state: ${JSON.stringify(projectState)}`;
+        liveSocket.send(JSON.stringify({
+          setup: {
+            model: 'models/gemini-3.8-live',
+            generationConfig: { responseModalities: ['AUDIO'] },
+            inputAudioTranscription: {},
+            outputAudioTranscription: {},
+            systemInstruction: { parts: [{ text: system }] }
+          }
+        }));
+
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        await audioContext.resume();
+        sourceNode = audioContext.createMediaStreamSource(mediaStream);
+        processorNode = audioContext.createScriptProcessor(4096, 1, 1);
+        processorNode.onaudioprocess = (event) => {
+          if (!liveSocket || liveSocket.readyState !== WebSocket.OPEN) return;
+          const input = event.inputBuffer.getChannelData(0);
+          const downsampled = downsampleTo16k(input, audioContext.sampleRate);
+          const pcm = floatTo16BitPCM(downsampled);
+          liveSocket.send(JSON.stringify({ realtimeInput: { audio: { data: arrayBufferToBase64(pcm), mimeType: 'audio/pcm;rate=16000' } } }));
+        };
+        sourceNode.connect(processorNode);
+        processorNode.connect(audioContext.destination);
+      };
+
+      liveSocket.onmessage = (event) => {
+        try {
+          const message = JSON.parse(event.data);
+          const content = message.serverContent;
+          if (!content) return;
+          if (content.inputTranscription?.text) {
+            liveUserTranscript += content.inputTranscription.text;
+          }
+          if (content.outputTranscription?.text) {
+            liveAssistantTranscript += content.outputTranscription.text;
+          }
+          const parts = content.modelTurn?.parts || [];
+          for (const part of parts) {
+            if (part.inlineData?.mimeType?.startsWith('audio/pcm')) playPcm24k(part.inlineData.data);
+            if (part.text) liveAssistantTranscript += part.text;
+          }
+          if (content.turnComplete) {
+            if (liveUserTranscript.trim()) {
+              const userText = liveUserTranscript.trim();
+              appendMessage('user', userText);
+              conversationHistory.push({ role: 'user', text: userText });
+              updateProjectFromVoiceTranscript(userText);
+            }
+            if (liveAssistantTranscript.trim()) {
+              const assistantText = liveAssistantTranscript.trim();
+              appendMessage('assistant', assistantText);
+              conversationHistory.push({ role: 'model', text: assistantText });
+            }
+            liveUserTranscript = ''; liveAssistantTranscript = '';
+            setVoiceState('listening', 'Listening...');
+          }
+        } catch (err) { console.warn('[HAVEN AI] Live message parse failed:', err); }
+      };
+
+      liveSocket.onerror = (event) => {
+        console.error('[HAVEN AI] Gemini Live socket error:', event);
+        setVoiceState('error', 'HAVEN AI voice could not connect. You can continue by typing.');
+      };
+      liveSocket.onclose = () => {
+        liveConnected = false;
+        stopLiveVoice();
+        setVoiceState('idle');
+      };
+    } catch (err) {
+      console.error('[HAVEN AI] Live voice startup failed:', err);
+      stopLiveVoice();
+      setVoiceState('error', 'HAVEN AI voice could not connect. Please check the AI connection and try again.');
     }
   }
 
-  // Submit Confirmed Project Brief
+  function stopLiveVoice() {
+    liveConnected = false;
+    if (processorNode) { try { processorNode.disconnect(); } catch (_) {} processorNode = null; }
+    if (sourceNode) { try { sourceNode.disconnect(); } catch (_) {} sourceNode = null; }
+    if (audioContext) { try { audioContext.close(); } catch (_) {} audioContext = null; }
+    if (mediaStream) mediaStream.getTracks().forEach(track => track.stop());
+    mediaStream = null;
+    if (liveSocket && liveSocket.readyState === WebSocket.OPEN) { try { liveSocket.close(); } catch (_) {} }
+    liveSocket = null;
+    playbackCursor = 0;
+  }
+
+  function toggleMicrophone() {
+    if (isSpeaking) stopSpeaking();
+    if (liveConnected) { stopLiveVoice(); setVoiceState('idle'); return; }
+    startLiveVoice();
+  }
+
   async function submitConfirmedEnquiry() {
     if (!sendEnquiryBtn) return;
-
-    // Check email
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     let clientEmail = projectState.email?.trim();
-
     if (!clientEmail || !emailRegex.test(clientEmail)) {
       const promptEmail = prompt('Please enter your contact email address so HAVEN can review and send your confirmed quote:');
-      if (promptEmail && emailRegex.test(promptEmail.trim())) {
-        projectState.email = promptEmail.trim();
-        clientEmail = projectState.email;
-        if (sumEmail) sumEmail.textContent = clientEmail;
-      } else {
-        alert('A valid email address is required before sending your enquiry.');
-        return;
-      }
+      if (promptEmail && emailRegex.test(promptEmail.trim())) { projectState.email = promptEmail.trim(); clientEmail = projectState.email; if (sumEmail) sumEmail.textContent = clientEmail; }
+      else { alert('A valid email address is required before sending your enquiry.'); return; }
     }
-
-    sendEnquiryBtn.disabled = true;
-    sendEnquiryBtn.textContent = 'Transmitting Brief...';
-
+    sendEnquiryBtn.disabled = true; sendEnquiryBtn.textContent = 'Transmitting Brief...';
     const payload = {
-      clientInfo: {
-        name: projectState.name || 'Valued Client',
-        email: clientEmail,
-        phone: projectState.phone || '',
-        country: projectState.country || '',
-        city: projectState.city || ''
-      },
-      business: {
-        businessName: projectState.businessName || 'New Brand',
-        businessType: projectState.businessType || 'General',
-        existingWebsite: projectState.existingWebsite || ''
-      },
-      project: {
-        websiteType: projectState.websiteType || 'Professional Website',
-        projectType: projectState.projectType || 'Template Suite',
-        template: projectState.template || 'Custom Vision',
-        pages: projectState.pages || [],
-        features: projectState.features || [],
-        hosting: projectState.hosting || 'Yes',
-        domain: projectState.domain || 'Yes'
-      },
-      budgetTimeline: {
-        budget: projectState.budget || 'Standard Tier',
-        timeline: projectState.timeline || '2–4 weeks'
-      },
-      design: {
-        style: projectState.stylePreferences || 'Dark cinematic & minimal',
-        brandColors: projectState.brandColors || 'HAVEN Aesthetics',
-        referenceWebsites: projectState.referenceWebsites || ''
-      },
-      additionalRequirements: projectState.additionalRequirements || '',
-      transcript: conversationHistory
+      clientInfo: { name: projectState.name || 'Valued Client', email: clientEmail, phone: projectState.phone || '', country: projectState.country || '', city: projectState.city || '' },
+      business: { businessName: projectState.businessName || 'New Brand', businessType: projectState.businessType || 'General', existingWebsite: projectState.existingWebsite || '' },
+      project: { websiteType: projectState.websiteType || 'Professional Website', projectType: projectState.projectType || 'Template Suite', template: projectState.template || 'Custom Vision', pages: projectState.pages || [], features: projectState.features || [], hosting: projectState.hosting || 'Yes', domain: projectState.domain || 'Yes' },
+      budgetTimeline: { budget: projectState.budget || 'Standard Tier', timeline: projectState.timeline || '2–4 weeks' },
+      design: { style: projectState.stylePreferences || 'Dark cinematic & minimal', brandColors: projectState.brandColors || 'HAVEN Aesthetics', referenceWebsites: projectState.referenceWebsites || '' },
+      additionalRequirements: projectState.additionalRequirements || '', transcript: conversationHistory
     };
-
     try {
-      const res = await fetch(`${API_BASE_URL}/api/submit-enquiry`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
-
+      const res = await fetch(`${API_BASE_URL}/api/submit-enquiry`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
       const resData = await res.json();
-
       if (res.ok && resData.success) {
         if (summaryBox) summaryBox.classList.remove('active');
-        if (successBox) {
-          if (successRefId) successRefId.textContent = resData.referenceId || 'HVN-CONFIRMED';
-          successBox.classList.add('active');
-          successBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }
+        if (successBox) { if (successRefId) successRefId.textContent = resData.referenceId || 'HVN-CONFIRMED'; successBox.classList.add('active'); successBox.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
         stopSpeaking();
-        const confirmationSpeech = `Thank you ${projectState.name || ''}. Your project enquiry has been confirmed and transmitted to the HAVEN team.`;
-        speakResponse(confirmationSpeech, 'en');
-      } else {
-        throw new Error(resData.error || 'Server rejected enquiry submission');
-      }
+        if (!isMuted) speakResponse(`Thank you ${projectState.name || ''}. Your project enquiry has been confirmed and transmitted to the HAVEN team.`, 'en');
+      } else throw new Error(resData.error || 'Server rejected enquiry submission');
     } catch (err) {
       console.error('[HAVEN AI] Submission error:', err);
       alert('Your enquiry could not be sent right now. Please try again or reach out directly at hello@havenweb.studio.');
-    } finally {
-      sendEnquiryBtn.disabled = false;
-      sendEnquiryBtn.textContent = 'SEND ENQUIRY →';
+    } finally { sendEnquiryBtn.disabled = false; sendEnquiryBtn.textContent = 'SEND ENQUIRY →'; }
+  }
+
+  if (startBtn) startBtn.addEventListener('click', () => {
+    if (canvas) {
+      canvas.style.display = 'flex'; canvas.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      setTimeout(() => { if (!isMuted) speakResponse("Welcome to HAVEN. Tell me what you're imagining for your website.", 'en'); }, 500);
     }
-  }
-
-  // Event Listeners
-  if (startBtn) {
-    startBtn.addEventListener('click', () => {
-      if (canvas) {
-        canvas.style.display = 'flex';
-        canvas.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        // Give polite voice introduction
-        setTimeout(() => {
-          speakResponse("Welcome to HAVEN. Tell me what you're imagining for your website.", 'en');
-        }, 500);
-      }
-    });
-  }
-
-  if (micBtn) {
-    micBtn.addEventListener('click', toggleMicrophone);
-  }
-
+  });
+  if (micBtn) micBtn.addEventListener('click', toggleMicrophone);
   if (sendBtn && textInput) {
-    sendBtn.addEventListener('click', () => {
-      const val = textInput.value.trim();
-      if (val) sendMessage(val);
-    });
-
-    textInput.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') {
-        const val = textInput.value.trim();
-        if (val) sendMessage(val);
-      }
-    });
+    sendBtn.addEventListener('click', () => { const val = textInput.value.trim(); if (val) sendMessage(val); });
+    textInput.addEventListener('keydown', e => { if (e.key === 'Enter') { const val = textInput.value.trim(); if (val) sendMessage(val); } });
   }
+  if (muteBtn) muteBtn.addEventListener('click', () => {
+    isMuted = !isMuted;
+    if (isMuted) { stopSpeaking(); if (muteLabel) muteLabel.textContent = 'Audio Muted'; muteBtn.style.opacity = '0.6'; }
+    else { if (muteLabel) muteLabel.textContent = 'Audio On'; muteBtn.style.opacity = '1'; }
+  });
+  if (stopSpeakingBtn) stopSpeakingBtn.addEventListener('click', stopSpeaking);
+  if (editDetailsBtn) editDetailsBtn.addEventListener('click', () => {
+    if (summaryBox) summaryBox.classList.remove('active');
+    appendMessage('assistant', 'What details would you like to refine? You can update your pages, features, template, or budget.');
+    if (textInput) textInput.focus();
+  });
+  if (sendEnquiryBtn) sendEnquiryBtn.addEventListener('click', submitConfirmedEnquiry);
+  if (newConsultationBtn) newConsultationBtn.addEventListener('click', () => window.location.reload());
+  if (resetBtn) resetBtn.addEventListener('click', () => {
+    if (!confirm('Start a fresh consultation with HAVEN AI?')) return;
+    stopLiveVoice(); stopSpeaking(); conversationHistory = [];
+    projectState = { name:'',email:'',phone:'',businessName:'',country:'',city:'',businessType:'',websiteType:'',projectType:'',template:'',pages:[],features:[],hosting:'',domain:'',budget:'',timeline:'',stylePreferences:'',brandColors:'',existingWebsite:'',referenceWebsites:'',additionalRequirements:'' };
+    if (thread) thread.innerHTML = `<div class="ai-chat-bubble assistant"><div class="chat-bubble-author"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="10"></circle></svg> HAVEN AI &bull; Senior Consultant</div><div class="chat-bubble-text">Session restarted. Tell me what kind of website or brand you'd like to build.</div></div>`;
+    if (summaryBox) summaryBox.classList.remove('active'); if (successBox) successBox.classList.remove('active');
+    ['pill-name','pill-biz','pill-type','pill-template','pill-budget'].forEach(id => { const el=document.getElementById(id); if(el) el.classList.remove('filled'); });
+    if(valName)valName.textContent='—'; if(valBiz)valBiz.textContent='—'; if(valType)valType.textContent='—'; if(valTemplate)valTemplate.textContent='—'; if(valBudget)valBudget.textContent='—'; setVoiceState('idle');
+  });
 
-  if (muteBtn) {
-    muteBtn.addEventListener('click', () => {
-      isMuted = !isMuted;
-      if (isMuted) {
-        stopSpeaking();
-        if (muteLabel) muteLabel.textContent = 'Audio Muted';
-        muteBtn.style.opacity = '0.6';
-      } else {
-        if (muteLabel) muteLabel.textContent = 'Audio On';
-        muteBtn.style.opacity = '1';
-      }
-    });
-  }
-
-  if (stopSpeakingBtn) {
-    stopSpeakingBtn.addEventListener('click', stopSpeaking);
-  }
-
-  if (resetBtn) {
-    resetBtn.addEventListener('click', () => {
-      if (confirm('Start a fresh consultation with HAVEN AI?')) {
-        stopSpeaking();
-        conversationHistory = [];
-        projectState = {
-          name: '',
-          email: '',
-          phone: '',
-          businessName: '',
-          country: '',
-          city: '',
-          businessType: '',
-          websiteType: '',
-          projectType: '',
-          template: '',
-          pages: [],
-          features: [],
-          hosting: '',
-          domain: '',
-          budget: '',
-          timeline: '',
-          stylePreferences: '',
-          brandColors: '',
-          existingWebsite: '',
-          referenceWebsites: '',
-          additionalRequirements: ''
-        };
-        if (thread) {
-          thread.innerHTML = `
-            <div class="ai-chat-bubble assistant">
-              <div class="chat-bubble-author">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="10"></circle></svg>
-                HAVEN AI &bull; Senior Consultant
-              </div>
-              <div class="chat-bubble-text">
-                Session restarted. Tell me what kind of website or brand you'd like to build.
-              </div>
-            </div>
-          `;
-        }
-        if (summaryBox) summaryBox.classList.remove('active');
-        if (successBox) successBox.classList.remove('active');
-        ['pill-name', 'pill-biz', 'pill-type', 'pill-template', 'pill-budget'].forEach(id => {
-          const el = document.getElementById(id);
-          if (el) el.classList.remove('filled');
-        });
-        if (valName) valName.textContent = '—';
-        if (valBiz) valBiz.textContent = '—';
-        if (valType) valType.textContent = '—';
-        if (valTemplate) valTemplate.textContent = '—';
-        if (valBudget) valBudget.textContent = '—';
-        setVoiceState('idle');
-      }
-    });
-  }
-
-  if (editDetailsBtn) {
-    editDetailsBtn.addEventListener('click', () => {
-      if (summaryBox) summaryBox.classList.remove('active');
-      appendMessage('assistant', "What details would you like to refine? You can update your pages, features, template, or budget.");
-      if (textInput) textInput.focus();
-    });
-  }
-
-  if (sendEnquiryBtn) {
-    sendEnquiryBtn.addEventListener('click', submitConfirmedEnquiry);
-  }
-
-  if (newConsultationBtn) {
-    newConsultationBtn.addEventListener('click', () => {
-      window.location.reload();
-    });
-  }
+  setVoiceState('idle');
 }
-

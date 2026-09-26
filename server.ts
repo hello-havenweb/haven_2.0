@@ -264,15 +264,18 @@ app.post('/api/chat', async (req: Request, res: Response) => {
           });
         }
       } catch (geminiCallErr: any) {
-        console.warn('[HAVEN AI] Gemini API call exception, using consultant fallback:', geminiCallErr?.message || geminiCallErr);
-        const fallbackResponse = generateFallbackConsultantResponse(message, projectState);
-        return res.json(fallbackResponse);
+        console.error('[HAVEN AI] Gemini API call failed:', geminiCallErr?.message || geminiCallErr);
+        return res.status(502).json({
+          error: 'Gemini request failed.',
+          reply: 'I could not reach the HAVEN AI service right now. Please try again in a moment.',
+        });
       }
     }
 
-    // Fallback if GEMINI_API_KEY is not yet populated in .env
-    const fallbackResponse = generateFallbackConsultantResponse(message, projectState);
-    return res.json(fallbackResponse);
+    return res.status(503).json({
+      error: 'GEMINI_API_KEY is not configured on the server.',
+      reply: 'HAVEN AI is not connected yet. Please try again shortly.',
+    });
   } catch (err: any) {
     console.error('[HAVEN AI] /api/chat error:', err);
     return res.status(500).json({
@@ -283,7 +286,59 @@ app.post('/api/chat', async (req: Request, res: Response) => {
 });
 
 // ============================================================================
-// 2. API: /api/submit-enquiry — Confirmed Project Brief Dispatch
+// 2. API: /api/live-token — Secure Gemini Live API ephemeral token
+// ============================================================================
+app.post('/api/live-token', async (_req: Request, res: Response) => {
+  try {
+    if (!geminiApiKey || geminiApiKey === 'your_gemini_api_key_here') {
+      return res.status(503).json({ error: 'Gemini API key is not configured on the server.' });
+    }
+
+    const now = Date.now();
+    const tokenResponse = await fetch('https://generativelanguage.googleapis.com/v1beta/auth_tokens', {
+      method: 'POST',
+      headers: {
+        'x-goog-api-key': geminiApiKey,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        uses: 1,
+        expireTime: new Date(now + 30 * 60 * 1000).toISOString(),
+        newSessionExpireTime: new Date(now + 60 * 1000).toISOString(),
+        liveConnectConstraints: {
+          model: 'gemini-3.8-live',
+          config: {
+            responseModalities: ['AUDIO'],
+            inputAudioTranscription: {},
+            outputAudioTranscription: {},
+          },
+        },
+      }),
+    });
+
+    const raw = await tokenResponse.text();
+    if (!tokenResponse.ok) {
+      console.error('[HAVEN AI] Live token provisioning failed:', tokenResponse.status, raw);
+      return res.status(tokenResponse.status).json({
+        error: 'Unable to create a Gemini Live session token.',
+      });
+    }
+
+    const data = JSON.parse(raw);
+    if (!data.name) {
+      console.error('[HAVEN AI] Live token response did not contain a token name.');
+      return res.status(502).json({ error: 'Gemini did not return a Live session token.' });
+    }
+
+    return res.json({ token: data.name });
+  } catch (err: any) {
+    console.error('[HAVEN AI] /api/live-token error:', err?.message || err);
+    return res.status(500).json({ error: 'Unable to initialize HAVEN AI voice right now.' });
+  }
+});
+
+// ============================================================================
+// 3. API: /api/submit-enquiry — Confirmed Project Brief Dispatch
 // ============================================================================
 app.post('/api/submit-enquiry', async (req: Request, res: Response) => {
   try {
