@@ -61,14 +61,34 @@
         </p>
       </div>
 
+      <!-- CURRENCY TOGGLE & CATEGORY INDICATOR -->
+      <div class="pricing-controls-row reveal">
+        <div class="currency-toggle-wrap">
+          <span class="currency-toggle-label">Select Currency:</span>
+          <div class="currency-toggle" role="group" aria-label="Toggle pricing currency">
+            <button class="currency-btn active" data-currency="pkr">PKR (₨)</button>
+            <button class="currency-btn" data-currency="usd">USD ($)</button>
+          </div>
+        </div>
+        <div class="pricing-category-pill">
+          <span>All packages include 100% sovereign code ownership</span>
+        </div>
+      </div>
+
+      <!-- SECTION: TURNKEY TEMPLATE PACKAGES -->
+      <div class="pricing-section-kicker reveal">
+        <span class="kicker-dot"></span>
+        <span class="kicker-title">Turnkey 6-Page Design Systems (Fixed Starting Pricing)</span>
+      </div>
+
       <!-- PRICING TIERS -->
-      <div class="pricing-table-grid reveal" style="margin-top: 2rem;">
+      <div class="pricing-table-grid reveal">
 
         <!-- TIER 1: TEMPLATE WEBSITE -->
-        <div class="pricing-mini-card">
+        <div class="pricing-mini-card" data-pkr-price="PKR 29,000" data-pkr-sub="Approx. $105 USD one-time" data-usd-price="$105 USD" data-usd-sub="Approx. PKR 29,000 one-time">
           <div class="pkg-tier">Template Website</div>
           <div class="pkg-price tabular-nums">PKR 29,000</div>
-          <div style="font-size: 0.8rem; color: var(--accent-lavender); margin-bottom: 0.75rem;">Approx. $105 USD one-time</div>
+          <div class="pkg-price-sub">Approx. $105 USD one-time</div>
           <div class="pkg-desc">Turnkey 6-page production code, typography system, domain assets, and instant static deployment.</div>
           <ul class="pkg-list">
             <li>Choice of any HAVEN 6-page system</li>
@@ -81,11 +101,11 @@
         </div>
 
         <!-- TIER 2: TEMPLATE + HOSTING (FEATURED) -->
-        <div class="pricing-mini-card featured">
-          <div class="pricing-badge">Popular</div>
+        <div class="pricing-mini-card featured" data-pkr-price="PKR 39,000" data-pkr-sub="Approx. $140 USD all-in" data-usd-price="$140 USD" data-usd-sub="Approx. PKR 39,000 all-in">
+          <div class="pricing-badge">Most Popular</div>
           <div class="pkg-tier">Template + Hosting</div>
           <div class="pkg-price tabular-nums">PKR 39,000</div>
-          <div style="font-size: 0.8rem; color: var(--accent-lavender); margin-bottom: 0.75rem;">Approx. $140 USD all-in</div>
+          <div class="pkg-price-sub">Approx. $140 USD all-in</div>
           <div class="pkg-desc">Complete multi-page template plus 1 full year high-speed global CDN edge hosting and automated SSL.</div>
           <ul class="pkg-list">
             <li>Everything in Template Website</li>
@@ -98,10 +118,10 @@
         </div>
 
         <!-- TIER 3: TEMPLATE + HOSTING + DOMAIN -->
-        <div class="pricing-mini-card">
+        <div class="pricing-mini-card" data-pkr-price="PKR 49,000" data-pkr-sub="Approx. $175 USD all-in" data-usd-price="$175 USD" data-usd-sub="Approx. PKR 49,000 all-in">
           <div class="pkg-tier">Template + Host + Domain</div>
           <div class="pkg-price tabular-nums">PKR 49,000</div>
-          <div style="font-size: 0.8rem; color: var(--accent-lavender); margin-bottom: 0.75rem;">Approx. $175 USD all-in</div>
+          <div class="pkg-price-sub">Approx. $175 USD all-in</div>
           <div class="pkg-desc">The complete hands-off launch package with custom domain registration, DNS orchestration, and edge hosting.</div>
           <ul class="pkg-list">
             <li>Everything in Template + Hosting</li>
@@ -113,12 +133,12 @@
           <a href="contact.html?budget=TemplateHostingDomain" class="btn btn-secondary btn-sm" style="width: 100%;">Select Package</a>
         </div>
 
-        <!-- TIER 4: CUSTOM WEBSITE -->
-        <div class="pricing-mini-card">
-          <div class="pkg-tier">Custom Website</div>
+        <!-- TIER 4: CUSTOM WEBSITE ARCHITECTURE -->
+        <div class="pricing-mini-card" data-pkr-price="From PKR 69,000" data-pkr-sub="From ~$250 USD bespoke" data-usd-price="From $250 USD" data-usd-sub="From ~PKR 69,000 bespoke">
+          <div class="pkg-tier">Custom Studio Build</div>
           <div class="pkg-price tabular-nums">From PKR 69,000</div>
-          <div style="font-size: 0.8rem; color: var(--accent-lavender); margin-bottom: 0.75rem;">From ~$250 USD bespoke</div>
-          <div class="pkg-desc">For ambitious organizations requiring tailored design architecture, custom interactions, and bespoke scope.</div>
+          <div class="pkg-price-sub">From ~$250 USD bespoke</div>
+          <div class="pkg-desc">For ambitious organizations requiring tailored design architecture, bespoke interactions, and unique scope.</div>
           <ul class="pkg-list">
             <li>Bespoke visual identity &amp; unique page layouts</li>
             <li>Tailored interactive features &amp; motion</li>
@@ -131,11 +151,96 @@
 
       </div>
 
+      <!-- FEATURE COMPARISON TABLE -->
+      <div class="pricing-comparison-wrap reveal" style="margin-top: 3.5rem;">
+        <h3 class="comparison-title">Package Comparison Matrix</h3>
+        <p class="comparison-subtitle">Every package delivers production-grade static architecture with zero vendor lock-in.</p>
+
+        <div class="comparison-table-scroll">
+          <table class="comparison-table">
+            <thead>
+              <tr>
+                <th>Features &amp; Inclusions</th>
+                <th>Template Only</th>
+                <th class="col-featured">Template + Hosting</th>
+                <th>Template + Host + Domain</th>
+                <th>Custom Studio Build</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Starting Price</td>
+                <td class="tabular-nums font-mono">PKR 29k / $105</td>
+                <td class="col-featured tabular-nums font-mono">PKR 39k / $140</td>
+                <td class="tabular-nums font-mono">PKR 49k / $175</td>
+                <td class="tabular-nums font-mono">From PKR 69k / $250</td>
+              </tr>
+              <tr>
+                <td>100% Code Ownership</td>
+                <td><span class="check-mark">✓</span> Yes</td>
+                <td class="col-featured"><span class="check-mark">✓</span> Yes</td>
+                <td><span class="check-mark">✓</span> Yes</td>
+                <td><span class="check-mark">✓</span> Yes</td>
+              </tr>
+              <tr>
+                <td>6 Complete Page Systems</td>
+                <td><span class="check-mark">✓</span> Yes</td>
+                <td class="col-featured"><span class="check-mark">✓</span> Yes</td>
+                <td><span class="check-mark">✓</span> Yes</td>
+                <td><span class="check-mark">✓</span> Bespoke Scale</td>
+              </tr>
+              <tr>
+                <td>Custom Brand Setup</td>
+                <td><span class="check-mark">✓</span> Standard</td>
+                <td class="col-featured"><span class="check-mark">✓</span> Standard</td>
+                <td><span class="check-mark">✓</span> Standard</td>
+                <td><span class="check-mark">✓</span> Bespoke Identity</td>
+              </tr>
+              <tr>
+                <td>1-Year Edge CDN Hosting</td>
+                <td><span class="dash-mark">—</span> Self-hosted</td>
+                <td class="col-featured"><span class="check-mark">✓</span> Included</td>
+                <td><span class="check-mark">✓</span> Included</td>
+                <td><span class="check-mark">✓</span> Included</td>
+              </tr>
+              <tr>
+                <td>Automated SSL Security</td>
+                <td><span class="dash-mark">—</span></td>
+                <td class="col-featured"><span class="check-mark">✓</span> Included</td>
+                <td><span class="check-mark">✓</span> Included</td>
+                <td><span class="check-mark">✓</span> Included</td>
+              </tr>
+              <tr>
+                <td>Custom Domain (.com / .org)</td>
+                <td><span class="dash-mark">—</span></td>
+                <td class="col-featured"><span class="dash-mark">—</span></td>
+                <td><span class="check-mark">✓</span> 1-Year Included</td>
+                <td><span class="check-mark">✓</span> Handled</td>
+              </tr>
+              <tr>
+                <td>DNS &amp; Email Routing</td>
+                <td><span class="dash-mark">—</span></td>
+                <td class="col-featured"><span class="dash-mark">—</span></td>
+                <td><span class="check-mark">✓</span> Included</td>
+                <td><span class="check-mark">✓</span> Enterprise DNS</td>
+              </tr>
+              <tr>
+                <td>Delivery Timeline</td>
+                <td>3–5 Business Days</td>
+                <td class="col-featured">3–5 Business Days</td>
+                <td>48–72 Hours Priority</td>
+                <td>2–4 Weeks Bespoke</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
       <!-- PRICING SCOPE DISCLAIMER -->
-      <div class="pricing-disclaimer-box reveal" style="margin-top: 2rem;">
+      <div class="pricing-disclaimer-box reveal" style="margin-top: 2.5rem;">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
         <p>
-          <strong>Scope Clarity:</strong> Final pricing may vary depending on unique customizations, additional pages, third-party integrations, and dynamic features. Base template packages provide turnkey structure and standard content placement with 100% code ownership.
+          <strong>Scope Clarity:</strong> Turnkey template packages provide complete 6-page design systems and initial content placement with zero ongoing platform subscription fees. Bespoke custom scopes and third-party API integrations are scoped transparently with confirmed quotes prior to commencement.
         </p>
       </div>
 

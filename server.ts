@@ -61,10 +61,10 @@ HAVEN FACTS & CAPABILITIES:
   5. NOVA — Corporate advisory, M&A consultancies, institutional turnarounds, investment firms.
   6. MONARCH — Executive personal brand, board advisors, keynote speakers, authors, thought leaders.
 - Transparent Starting Pricing:
-  - Template Website: PKR 29,000 (approx. $890 USD one-time)
-  - Template + Hosting: PKR 39,000 (approx. $1,250 USD)
-  - Template + Hosting + Domain: PKR 49,000 (approx. $1,550 USD)
-  - Custom Website: From PKR 69,000 (from $2,400+ USD)
+  - Template Website: PKR 29,000 (approx. $105 USD one-time)
+  - Template + Hosting: PKR 39,000 (approx. $140 USD all-in)
+  - Template + Hosting + Domain: PKR 49,000 (approx. $175 USD all-in)
+  - Custom Website: From PKR 69,000 (from ~$250+ USD bespoke)
   - Always explain that starting prices cover the turnkey multi-page design system and initial content placement, and final pricing varies based on custom pages, integrations, and unique requirements. Never promise a fixed final quote—HAVEN's team will confirm the final quote upon review.
 - Never invent fake statistics, fake awards, fake testimonials, or non-existent templates.
 
@@ -272,9 +272,13 @@ app.post('/api/chat', async (req: Request, res: Response) => {
       }
     }
 
-    return res.status(503).json({
-      error: 'GEMINI_API_KEY is not configured on the server.',
-      reply: 'HAVEN AI is not connected yet. Please try again shortly.',
+    // Graceful fallback consultant engine if Gemini API key is not yet set
+    const fallback = generateFallbackConsultantResponse(message, projectState);
+    return res.json({
+      reply: fallback.reply,
+      projectState: fallback.projectState,
+      isReadyForSummary: fallback.isReadyForSummary,
+      detectedLanguage: fallback.detectedLanguage || 'en',
     });
   } catch (err: any) {
     console.error('[HAVEN AI] /api/chat error:', err);

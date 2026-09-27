@@ -6,9 +6,11 @@
 document.addEventListener('DOMContentLoaded', () => {
   initNightDaySlider();
   initMobileNav();
+  initHeaderScroll();
   initScrollReveal();
   initContactForm();
   initTemplateFilters();
+  initCurrencyToggle();
   initParallaxEffects();
   autoSelectTemplateFromUrl();
   initHavenAI();
@@ -179,6 +181,27 @@ function initMobileNav() {
   });
 }
 
+function initHeaderScroll() {
+  const header = document.querySelector('.site-header');
+  if (!header) return;
+  let ticking = false;
+  const onScroll = () => {
+    if (!ticking) {
+      window.requestAnimationFrame(() => {
+        if (window.scrollY > 16) {
+          header.classList.add('scrolled');
+        } else {
+          header.classList.remove('scrolled');
+        }
+        ticking = false;
+      });
+      ticking = true;
+    }
+  };
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+}
+
 /* ==========================================================================
    3. SCROLL REVEAL (INTERSECTION OBSERVER)
    ========================================================================== */
@@ -292,6 +315,52 @@ function initTemplateFilters() {
       });
     });
   });
+}
+
+/* ==========================================================================
+   5B. CURRENCY SWITCHER (PKR / USD)
+   ========================================================================== */
+function initCurrencyToggle() {
+  const currencyBtns = document.querySelectorAll('.currency-btn');
+  const cards = document.querySelectorAll('.pricing-mini-card[data-pkr-price]');
+
+  if (currencyBtns.length === 0 || cards.length === 0) return;
+
+  function setCurrency(currency) {
+    currencyBtns.forEach(b => b.classList.toggle('active', b.getAttribute('data-currency') === currency));
+
+    cards.forEach(card => {
+      const priceEl = card.querySelector('.pkg-price');
+      const subEl = card.querySelector('.pkg-price-sub');
+
+      if (currency === 'usd') {
+        if (priceEl && card.dataset.usdPrice) priceEl.textContent = card.dataset.usdPrice;
+        if (subEl && card.dataset.usdSub) subEl.textContent = card.dataset.usdSub;
+      } else {
+        if (priceEl && card.dataset.pkrPrice) priceEl.textContent = card.dataset.pkrPrice;
+        if (subEl && card.dataset.pkrSub) subEl.textContent = card.dataset.pkrSub;
+      }
+    });
+
+    try {
+      localStorage.setItem('haven_currency', currency);
+    } catch (_) {}
+  }
+
+  currencyBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const chosen = btn.getAttribute('data-currency');
+      setCurrency(chosen);
+    });
+  });
+
+  // Restore previous choice if any
+  try {
+    const saved = localStorage.getItem('haven_currency');
+    if (saved && (saved === 'pkr' || saved === 'usd')) {
+      setCurrency(saved);
+    }
+  } catch (_) {}
 }
 
 /* ==========================================================================
@@ -481,7 +550,7 @@ function initHavenAI() {
     referenceWebsites: '', additionalRequirements: ''
   };
 
-  const API_BASE_URL = 'YOUR_BACKEND_URL'.replace(/\/$/, '');
+  const API_BASE_URL = (typeof window !== 'undefined' && window.location && window.location.origin && !window.location.origin.includes('YOUR_BACKEND_URL')) ? window.location.origin : '';
   const LIVE_WS_BASE = 'wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1beta.GenerativeService.BidiGenerateContentConstrained';
   let liveSocket = null;
   let mediaStream = null;
