@@ -386,6 +386,17 @@
     <span>HAVEN AI</span>
   </a>
 
+  <!-- HAVEN AI BACKEND CONFIGURATION -->
+  <script>
+    // Configurable backend API base URL for static frontend deployments (e.g. haven.pntr.dev)
+    // When hosted on the full-stack server directly or locally, relative '' is used.
+    // For static hosting at haven.pntr.dev, automatically connects to the deployed backend URL.
+    window.HAVEN_API_BASE_URL = window.HAVEN_API_BASE_URL || (
+      window.location.hostname === 'haven.pntr.dev'
+        ? 'https://ais-pre-i4nqoz75rmkkyd6niczn64-1276637696.asia-southeast1.run.app'
+        : ''
+    );
+  </script>
   <script src="script.js" defer></script>
 </body>
 </html>
