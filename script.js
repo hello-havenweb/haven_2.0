@@ -18,68 +18,38 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 /* ==========================================================================
-   0. GLOBAL CINEMATIC ATMOSPHERIC BACKGROUND & AMBIENT MOUSE GLOW
+   0. GLOBAL CINEMATIC ANIMATED ATMOSPHERIC BACKGROUND
+   Pure GPU-accelerated CSS animations • Zero scroll lag • Zero CPU overhead
    ========================================================================== */
 function initAtmosphericBackground() {
-  // Ensure the multi-layered atmospheric ambient backdrop exists on every page
   if (!document.querySelector('.haven-ambient-backdrop')) {
     const backdrop = document.createElement('div');
     backdrop.className = 'haven-ambient-backdrop';
     backdrop.setAttribute('aria-hidden', 'true');
+
+    // 18 lightweight atmospheric particles of subtle purple light
+    let particlesHtml = '';
+    const particleCount = 18;
+    for (let i = 0; i < particleCount; i++) {
+      const left = ((i * 5.4 + 2) % 96).toFixed(1);
+      const delay = ((i * 1.6) % 18).toFixed(1);
+      const duration = (18 + (i * 2) % 12).toFixed(1);
+      const size = (2 + (i % 3) * 0.8).toFixed(1);
+      const driftX = (((i % 5) - 2) * 20).toFixed(0);
+      particlesHtml += `<span class="ambient-particle" style="left:${left}%; width:${size}px; height:${size}px; animation-duration:${duration}s; animation-delay:-${delay}s; --p-dx:${driftX}px;"></span>`;
+    }
+
     backdrop.innerHTML = `
+      <div class="ambient-aurora-layer"></div>
       <div class="ambient-glow-orb ambient-orb-1"></div>
       <div class="ambient-glow-orb ambient-orb-2"></div>
       <div class="ambient-glow-orb ambient-orb-3"></div>
-      <div class="ambient-glow-mouse" id="ambient-mouse-glow"></div>
-      <div class="ambient-noise-texture"></div>
+      <div class="ambient-atmospheric-glow"></div>
+      <div class="ambient-particles-container">
+        ${particlesHtml}
+      </div>
     `;
     document.body.prepend(backdrop);
-  }
-
-  // Very subtle mouse-follow ambient light
-  const mouseGlow = document.getElementById('ambient-mouse-glow');
-  const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const isTouch = window.matchMedia('(pointer: coarse)').matches;
-
-  if (mouseGlow && !prefersReduced && !isTouch) {
-    let targetX = window.innerWidth / 2;
-    let targetY = window.innerHeight / 3;
-    let currentX = targetX;
-    let currentY = targetY;
-    let rafId = null;
-    let isActive = false;
-
-    function renderGlow() {
-      // Smooth lerp dampening
-      currentX += (targetX - currentX) * 0.045;
-      currentY += (targetY - currentY) * 0.045;
-      mouseGlow.style.transform = `translate3d(${currentX.toFixed(1)}px, ${currentY.toFixed(1)}px, 0)`;
-
-      if (Math.abs(targetX - currentX) > 0.1 || Math.abs(targetY - currentY) > 0.1) {
-        rafId = requestAnimationFrame(renderGlow);
-      } else {
-        rafId = null;
-      }
-    }
-
-    window.addEventListener('mousemove', (e) => {
-      targetX = e.clientX;
-      targetY = e.clientY;
-      if (!isActive) {
-        isActive = true;
-        mouseGlow.classList.add('is-active');
-      }
-      if (!rafId) {
-        rafId = requestAnimationFrame(renderGlow);
-      }
-    }, { passive: true });
-
-    window.addEventListener('mouseleave', () => {
-      if (isActive) {
-        isActive = false;
-        mouseGlow.classList.remove('is-active');
-      }
-    });
   }
 }
 
@@ -592,82 +562,12 @@ function autoSelectTemplateFromUrl() {
 }
 
 /* ==========================================================================
-   7. SUBTLE LAYERED PARALLAX ON HERO GRAPHICS & WOLF SILHOUETTE
+   7. MOTION & SCROLL DISCIPLINE
+   Decorative animations are strictly GPU-accelerated CSS to keep scrolling 100% smooth.
    ========================================================================== */
 function initParallaxEffects() {
-  const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const isTouch = window.matchMedia('(pointer: coarse)').matches;
-  if (prefersReduced || isTouch) return;
-
-  const card = document.querySelector('.split-viewer-card');
-  const stars = document.querySelector('.stars-overlay');
-  const glow = document.querySelector('.wolf-atmosphere-glow');
-  const wolfSilhouette = document.getElementById('wolf-parallax-target');
-
-  if (!card && !wolfSilhouette) return;
-
-  let mouseX = 0;
-  let mouseY = 0;
-  let currentX = 0;
-  let currentY = 0;
-  let rafId = null;
-
-  function onMouseMove(e) {
-    const centerX = window.innerWidth * 0.5;
-    const centerY = window.innerHeight * 0.4;
-
-    // Normalized offset (-1 to 1) relative to viewport center
-    mouseX = Math.max(-1, Math.min(1, (e.clientX - centerX) / (window.innerWidth * 0.5)));
-    mouseY = Math.max(-1, Math.min(1, (e.clientY - centerY) / (window.innerHeight * 0.5)));
-
-    if (!rafId) {
-      rafId = requestAnimationFrame(updateParallax);
-    }
-  }
-
-  function updateParallax() {
-    // Smooth dampening interpolation (lerp)
-    currentX += (mouseX - currentX) * 0.075;
-    currentY += (mouseY - currentY) * 0.075;
-
-    // Split viewer card 3D tilt
-    if (card) {
-      const rotY = (currentX * 2.8).toFixed(2);
-      const rotX = (-currentY * 1.8).toFixed(2);
-      card.style.transform = `perspective(1200px) rotateY(${rotY}deg) rotateX(${rotX}deg)`;
-    }
-
-    // Layered depth: stars shift minimally, atmosphere shimmers gently
-    if (stars) {
-      stars.style.transform = `translate3d(${(-currentX * 5).toFixed(1)}px, ${(-currentY * 3).toFixed(1)}px, 0)`;
-    }
-    if (glow) {
-      glow.style.transform = `translate3d(${(currentX * 4).toFixed(1)}px, ${(currentY * 3).toFixed(1)}px, 0)`;
-    }
-
-    // Wolf silhouette background layer: subtle counter-movement (Easter egg depth)
-    if (wolfSilhouette) {
-      const wolfX = (-currentX * 10).toFixed(1);
-      const wolfY = (-currentY * 7).toFixed(1);
-      wolfSilhouette.style.transform = `translate3d(${wolfX}px, calc(-50% + ${wolfY}px), 0)`;
-    }
-
-    if (Math.abs(mouseX - currentX) > 0.001 || Math.abs(mouseY - currentY) > 0.001) {
-      rafId = requestAnimationFrame(updateParallax);
-    } else {
-      rafId = null;
-    }
-  }
-
-  window.addEventListener('mousemove', onMouseMove, { passive: true });
-
-  window.addEventListener('mouseleave', () => {
-    mouseX = 0;
-    mouseY = 0;
-    if (!rafId) {
-      rafId = requestAnimationFrame(updateParallax);
-    }
-  });
+  // Purposely empty: prevents any mousemove JS event overhead during scroll
+  // and ensures cards, text, and content never shift or lag.
 }
 
 /* ==========================================================================
