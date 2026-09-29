@@ -4,6 +4,7 @@
  */
 
 document.addEventListener('DOMContentLoaded', () => {
+  initAtmosphericBackground();
   initNightDaySlider();
   initMobileNav();
   initHeaderScroll();
@@ -15,6 +16,72 @@ document.addEventListener('DOMContentLoaded', () => {
   autoSelectTemplateFromUrl();
   initHavenAI();
 });
+
+/* ==========================================================================
+   0. GLOBAL CINEMATIC ATMOSPHERIC BACKGROUND & AMBIENT MOUSE GLOW
+   ========================================================================== */
+function initAtmosphericBackground() {
+  // Ensure the multi-layered atmospheric ambient backdrop exists on every page
+  if (!document.querySelector('.haven-ambient-backdrop')) {
+    const backdrop = document.createElement('div');
+    backdrop.className = 'haven-ambient-backdrop';
+    backdrop.setAttribute('aria-hidden', 'true');
+    backdrop.innerHTML = `
+      <div class="ambient-glow-orb ambient-orb-1"></div>
+      <div class="ambient-glow-orb ambient-orb-2"></div>
+      <div class="ambient-glow-orb ambient-orb-3"></div>
+      <div class="ambient-glow-mouse" id="ambient-mouse-glow"></div>
+      <div class="ambient-noise-texture"></div>
+    `;
+    document.body.prepend(backdrop);
+  }
+
+  // Very subtle mouse-follow ambient light
+  const mouseGlow = document.getElementById('ambient-mouse-glow');
+  const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const isTouch = window.matchMedia('(pointer: coarse)').matches;
+
+  if (mouseGlow && !prefersReduced && !isTouch) {
+    let targetX = window.innerWidth / 2;
+    let targetY = window.innerHeight / 3;
+    let currentX = targetX;
+    let currentY = targetY;
+    let rafId = null;
+    let isActive = false;
+
+    function renderGlow() {
+      // Smooth lerp dampening
+      currentX += (targetX - currentX) * 0.045;
+      currentY += (targetY - currentY) * 0.045;
+      mouseGlow.style.transform = `translate3d(${currentX.toFixed(1)}px, ${currentY.toFixed(1)}px, 0)`;
+
+      if (Math.abs(targetX - currentX) > 0.1 || Math.abs(targetY - currentY) > 0.1) {
+        rafId = requestAnimationFrame(renderGlow);
+      } else {
+        rafId = null;
+      }
+    }
+
+    window.addEventListener('mousemove', (e) => {
+      targetX = e.clientX;
+      targetY = e.clientY;
+      if (!isActive) {
+        isActive = true;
+        mouseGlow.classList.add('is-active');
+      }
+      if (!rafId) {
+        rafId = requestAnimationFrame(renderGlow);
+      }
+    }, { passive: true });
+
+    window.addEventListener('mouseleave', () => {
+      if (isActive) {
+        isActive = false;
+        mouseGlow.classList.remove('is-active');
+      }
+    });
+  }
+}
 
 /* ==========================================================================
    1. HERO NIGHT / DAY INTERACTIVE SPLIT SLIDER
@@ -525,19 +592,19 @@ function autoSelectTemplateFromUrl() {
 }
 
 /* ==========================================================================
-   7. SUBTLE LAYERED PARALLAX ON HERO GRAPHICS
+   7. SUBTLE LAYERED PARALLAX ON HERO GRAPHICS & WOLF SILHOUETTE
    ========================================================================== */
 function initParallaxEffects() {
   const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  if (prefersReduced) return;
+  const isTouch = window.matchMedia('(pointer: coarse)').matches;
+  if (prefersReduced || isTouch) return;
 
   const card = document.querySelector('.split-viewer-card');
   const stars = document.querySelector('.stars-overlay');
   const glow = document.querySelector('.wolf-atmosphere-glow');
-  const wolfImg = document.querySelector('.hero-wolf-img');
-  const dayImg = document.querySelector('.hero-day-img');
+  const wolfSilhouette = document.getElementById('wolf-parallax-target');
 
-  if (!card) return;
+  if (!card && !wolfSilhouette) return;
 
   let mouseX = 0;
   let mouseY = 0;
@@ -546,11 +613,10 @@ function initParallaxEffects() {
   let rafId = null;
 
   function onMouseMove(e) {
-    const rect = card.getBoundingClientRect();
-    const centerX = rect.left + rect.width / 2;
-    const centerY = rect.top + rect.height / 2;
+    const centerX = window.innerWidth * 0.5;
+    const centerY = window.innerHeight * 0.4;
 
-    // Normalized offset relative to hero card
+    // Normalized offset (-1 to 1) relative to viewport center
     mouseX = Math.max(-1, Math.min(1, (e.clientX - centerX) / (window.innerWidth * 0.5)));
     mouseY = Math.max(-1, Math.min(1, (e.clientY - centerY) / (window.innerHeight * 0.5)));
 
@@ -561,13 +627,15 @@ function initParallaxEffects() {
 
   function updateParallax() {
     // Smooth dampening interpolation (lerp)
-    currentX += (mouseX - currentX) * 0.08;
-    currentY += (mouseY - currentY) * 0.08;
+    currentX += (mouseX - currentX) * 0.075;
+    currentY += (mouseY - currentY) * 0.075;
 
-    const rotY = (currentX * 3).toFixed(2);
-    const rotX = (-currentY * 2).toFixed(2);
-
-    card.style.transform = `perspective(1200px) rotateY(${rotY}deg) rotateX(${rotX}deg)`;
+    // Split viewer card 3D tilt
+    if (card) {
+      const rotY = (currentX * 2.8).toFixed(2);
+      const rotX = (-currentY * 1.8).toFixed(2);
+      card.style.transform = `perspective(1200px) rotateY(${rotY}deg) rotateX(${rotX}deg)`;
+    }
 
     // Layered depth: stars shift minimally, atmosphere shimmers gently
     if (stars) {
@@ -575,6 +643,13 @@ function initParallaxEffects() {
     }
     if (glow) {
       glow.style.transform = `translate3d(${(currentX * 4).toFixed(1)}px, ${(currentY * 3).toFixed(1)}px, 0)`;
+    }
+
+    // Wolf silhouette background layer: subtle counter-movement (Easter egg depth)
+    if (wolfSilhouette) {
+      const wolfX = (-currentX * 10).toFixed(1);
+      const wolfY = (-currentY * 7).toFixed(1);
+      wolfSilhouette.style.transform = `translate3d(${wolfX}px, calc(-50% + ${wolfY}px), 0)`;
     }
 
     if (Math.abs(mouseX - currentX) > 0.001 || Math.abs(mouseY - currentY) > 0.001) {
@@ -592,43 +667,6 @@ function initParallaxEffects() {
     if (!rafId) {
       rafId = requestAnimationFrame(updateParallax);
     }
-  });
-}
-
-/* ==========================================================================
-   7b. CURRENCY TOGGLE (PKR / USD)
-   ========================================================================== */
-function initCurrencyToggle() {
-  const toggleBtns = document.querySelectorAll('.currency-btn');
-  const cards = document.querySelectorAll('.pricing-mini-card[data-pkr-price]');
-  if (!toggleBtns.length || !cards.length) return;
-
-  function setCurrency(curr) {
-    toggleBtns.forEach(btn => {
-      const isActive = btn.dataset.currency === curr;
-      btn.classList.toggle('active', isActive);
-      btn.setAttribute('aria-pressed', isActive ? 'true' : 'false');
-    });
-
-    cards.forEach(card => {
-      const priceEl = card.querySelector('.pkg-price');
-      const subEl = card.querySelector('.pkg-price-sub');
-
-      if (curr === 'usd') {
-        if (priceEl && card.dataset.usdPrice) priceEl.textContent = card.dataset.usdPrice;
-        if (subEl && card.dataset.usdSub) subEl.textContent = card.dataset.usdSub;
-      } else {
-        if (priceEl && card.dataset.pkrPrice) priceEl.textContent = card.dataset.pkrPrice;
-        if (subEl && card.dataset.pkrSub) subEl.textContent = card.dataset.pkrSub;
-      }
-    });
-  }
-
-  toggleBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-      const curr = btn.dataset.currency;
-      if (curr) setCurrency(curr);
-    });
   });
 }
 

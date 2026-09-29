@@ -56,6 +56,52 @@
        HERO SECTION
        ========================================================================= -->
   <section class="hero-section">
+    <!-- WOLF-INSPIRED ATMOSPHERIC HERO BACKGROUND LAYER -->
+    <div class="hero-wolf-atmosphere" aria-hidden="true">
+      <!-- Distant Veiled Purple Moonlight Glow -->
+      <div class="wolf-moonlight-glow"></div>
+      
+      <!-- Noble Atmospheric Wolf Silhouette & Soft Glowing Eyes -->
+      <div class="wolf-silhouette-wrap" id="wolf-parallax-target">
+        <svg class="wolf-silhouette-svg" viewBox="0 0 540 460" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="wolfAtmosphereGrad" x1="50%" y1="0%" x2="50%" y2="100%">
+              <stop offset="0%" stop-color="#c084fc" stop-opacity="0.22" />
+              <stop offset="35%" stop-color="#9333ea" stop-opacity="0.14" />
+              <stop offset="70%" stop-color="#581c87" stop-opacity="0.08" />
+              <stop offset="100%" stop-color="#07050e" stop-opacity="0.0" />
+            </linearGradient>
+            <radialGradient id="wolfEyeGleam" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stop-color="#ffffff" stop-opacity="0.95" />
+              <stop offset="35%" stop-color="#f3e8ff" stop-opacity="0.85" />
+              <stop offset="65%" stop-color="#c084fc" stop-opacity="0.55" />
+              <stop offset="100%" stop-color="#9333ea" stop-opacity="0" />
+            </radialGradient>
+            <filter id="wolfMistBlur" x="-10%" y="-10%" width="120%" height="120%">
+              <feGaussianBlur stdDeviation="1.5" />
+            </filter>
+          </defs>
+
+          <!-- Architectural & Organic Silhouette of Wolf emerging from mist -->
+          <path class="wolf-silhouette-path" filter="url(#wolfMistBlur)" fill="url(#wolfAtmosphereGrad)" d="M148 42 C142 55, 134 85, 132 118 C116 132, 98 156, 86 182 C72 212, 64 246, 68 280 C72 312, 88 340, 114 364 C146 395, 192 422, 246 436 C302 444, 358 434, 404 406 C442 382, 468 344, 476 304 C484 262, 474 220, 452 184 C436 156, 416 132, 396 116 C394 84, 386 54, 380 42 C374 30, 364 34, 356 48 C342 72, 332 98, 324 122 C302 110, 276 104, 250 106 C224 104, 198 110, 176 122 C168 98, 158 72, 144 48 C136 34, 126 30, 148 42 Z" />
+          
+          <!-- Subtle sculptural geometric facets tracing wolf brows, cheekbones, and crest -->
+          <path stroke="rgba(192, 132, 252, 0.15)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" fill="none" d="M148 42 L185 125 L250 152 L315 125 L380 42 M185 125 L215 178 L250 196 L285 178 L315 125 M250 152 L250 196 M215 178 L232 235 L250 252 L268 235 L285 178 M250 252 L250 286 M185 125 L132 178 L142 245 L200 280 L232 235 M315 125 L368 178 L358 245 L300 280 L268 235 M200 280 L250 330 L300 280 M142 245 L114 315 L160 365 L215 350 L250 330 M358 245 L386 315 L340 365 L285 350 L250 330 M160 365 L246 415 L340 365" />
+          
+          <!-- Faint Purple Glowing Wolf Eyes (Subtle visual Easter egg) -->
+          <g class="wolf-eyes-group">
+            <!-- Left Eye -->
+            <ellipse class="wolf-eye-glow" cx="218" cy="178" rx="6.5" ry="3.2" transform="rotate(-8 218 178)" fill="url(#wolfEyeGleam)" />
+            <circle class="wolf-pupil-spark" cx="218" cy="177.5" r="1.1" fill="#ffffff" />
+            
+            <!-- Right Eye -->
+            <ellipse class="wolf-eye-glow" cx="282" cy="178" rx="6.5" ry="3.2" transform="rotate(8 282 178)" fill="url(#wolfEyeGleam)" />
+            <circle class="wolf-pupil-spark" cx="282" cy="177.5" r="1.1" fill="#ffffff" />
+          </g>
+        </svg>
+      </div>
+    </div>
+
     <div class="container">
       <div class="hero-grid">
         

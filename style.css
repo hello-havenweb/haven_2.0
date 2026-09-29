@@ -66,10 +66,119 @@ body {
   flex-direction: column;
   overflow-x: hidden;
   line-height: 1.65;
-  background: radial-gradient(circle at 50% -5%, rgba(147, 51, 234, 0.18) 0%, transparent 60%),
-              radial-gradient(circle at 88% 22%, rgba(56, 189, 248, 0.05) 0%, transparent 45%),
-              radial-gradient(circle at 12% 55%, rgba(168, 85, 247, 0.07) 0%, transparent 50%),
-              var(--bg-deep);
+  background-color: var(--bg-deep);
+}
+
+/* ==========================================================================
+   GLOBAL CINEMATIC ATMOSPHERIC BACKGROUND (MULTI-LAYERED & SUBTLE)
+   Layer 1: Deep obsidian base
+   Layer 2: Primary large blurred purple ambient orb
+   Layer 3: Secondary violet/indigo drifting glow orb
+   Layer 4: Subtle lower atmospheric gradient orb
+   Layer 5: Extremely subtle mouse-follow ambient light
+   Layer 6: Micro analog grain texture
+   ========================================================================== */
+.haven-ambient-backdrop {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+  background-color: var(--bg-deep);
+}
+
+.ambient-glow-orb {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  will-change: transform;
+}
+
+/* Layer 2: Primary Large Blurred Purple Glow Orb */
+.ambient-orb-1 {
+  width: clamp(650px, 68vw, 1100px);
+  height: clamp(550px, 58vw, 950px);
+  top: -160px;
+  left: -100px;
+  background: radial-gradient(circle at 45% 45%, rgba(147, 51, 234, 0.16) 0%, rgba(107, 33, 168, 0.07) 50%, transparent 72%);
+  filter: blur(130px);
+  animation: ambientOrbFloat1 32s ease-in-out infinite alternate;
+}
+
+/* Layer 3: Secondary Violet/Indigo Drifting Glow Orb */
+.ambient-orb-2 {
+  width: clamp(580px, 62vw, 980px);
+  height: clamp(500px, 55vw, 880px);
+  top: 42%;
+  right: -160px;
+  background: radial-gradient(circle at 50% 50%, rgba(168, 85, 247, 0.12) 0%, rgba(88, 28, 135, 0.055) 52%, transparent 75%);
+  filter: blur(140px);
+  animation: ambientOrbFloat2 38s ease-in-out infinite alternate;
+}
+
+/* Layer 4: Deep Subtle Lower Atmospheric Gradient */
+.ambient-orb-3 {
+  width: clamp(520px, 50vw, 850px);
+  height: clamp(450px, 45vw, 750px);
+  bottom: -140px;
+  left: 20%;
+  background: radial-gradient(circle at 50% 50%, rgba(88, 28, 135, 0.14) 0%, rgba(126, 34, 206, 0.045) 55%, transparent 72%);
+  filter: blur(140px);
+  animation: ambientOrbFloat3 44s ease-in-out infinite alternate;
+}
+
+/* Layer 5: Mouse-follow Ambient Light */
+.ambient-glow-mouse {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 720px;
+  height: 720px;
+  margin-top: -360px;
+  margin-left: -360px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(168, 85, 247, 0.075) 0%, rgba(147, 51, 234, 0.025) 45%, transparent 70%);
+  filter: blur(110px);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.8s ease;
+  will-change: transform;
+}
+
+.ambient-glow-mouse.is-active {
+  opacity: 1;
+}
+
+/* Layer 6: Micro Analog Film Grain Texture */
+.ambient-noise-texture {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0.022;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+}
+
+/* Float Keyframes: Slow, Calming, Cinematic */
+@keyframes ambientOrbFloat1 {
+  0% { transform: translate3d(0, 0, 0) scale(1); }
+  50% { transform: translate3d(55px, 40px, 0) scale(1.07); }
+  100% { transform: translate3d(-30px, 60px, 0) scale(0.96); }
+}
+
+@keyframes ambientOrbFloat2 {
+  0% { transform: translate3d(0, 0, 0) scale(1); }
+  50% { transform: translate3d(-50px, -45px, 0) scale(1.05); }
+  100% { transform: translate3d(25px, -25px, 0) scale(0.97); }
+}
+
+@keyframes ambientOrbFloat3 {
+  0% { transform: translate3d(0, 0, 0) scale(1); }
+  50% { transform: translate3d(40px, -35px, 0) scale(1.06); }
+  100% { transform: translate3d(-35px, 20px, 0) scale(0.98); }
 }
 
 img {
@@ -241,11 +350,35 @@ h1, h2, h3, h4, .brand-font {
   align-items: center;
   justify-content: center;
   box-shadow: 0 0 18px rgba(168, 85, 247, 0.45);
-  transition: box-shadow var(--transition-fast), transform var(--transition-fast);
+  transition: box-shadow var(--transition-normal), transform var(--transition-normal);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Subtle wolf spirit micro-gleam on mascot icon */
+.brand-icon::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #ffffff 0%, #c084fc 60%, transparent 100%);
+  transform: translate(-50%, -50%) scale(0);
+  opacity: 0;
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s ease;
+  pointer-events: none;
 }
 
 .nav-brand:hover .brand-icon {
-  box-shadow: 0 0 24px rgba(168, 85, 247, 0.7);
+  transform: scale(1.05) translateY(-1px);
+  box-shadow: 0 0 28px rgba(168, 85, 247, 0.75), 0 0 10px rgba(243, 232, 255, 0.45);
+}
+
+.nav-brand:hover .brand-icon::after {
+  transform: translate(-50%, -50%) scale(1.6);
+  opacity: 0.85;
 }
 
 .brand-icon svg {
@@ -401,6 +534,75 @@ h1, h2, h3, h4, .brand-font {
   padding: 4.5rem 0 5.5rem;
   position: relative;
   overflow: hidden;
+}
+
+/* WOLF SILHOUETTE & ATMOSPHERIC HERO ENVIRONMENT */
+.hero-wolf-atmosphere {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 1;
+}
+
+/* Distant veiled purple moonlight glow */
+.wolf-moonlight-glow {
+  position: absolute;
+  top: -80px;
+  right: 18%;
+  width: 580px;
+  height: 580px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(168, 85, 247, 0.12) 0%, rgba(147, 51, 234, 0.04) 48%, transparent 72%);
+  filter: blur(85px);
+  animation: moonlightBreathe 18s ease-in-out infinite alternate;
+}
+
+@keyframes moonlightBreathe {
+  0% { transform: scale(0.95) translate(0, 0); opacity: 0.75; }
+  50% { transform: scale(1.06) translate(12px, 8px); opacity: 0.95; }
+  100% { transform: scale(0.97) translate(-8px, 4px); opacity: 0.8; }
+}
+
+/* Noble Wolf Silhouette emerging from purple atmosphere */
+.wolf-silhouette-wrap {
+  position: absolute;
+  top: 48%;
+  right: 6%;
+  transform: translateY(-50%);
+  width: clamp(380px, 46vw, 680px);
+  height: auto;
+  opacity: 0.18;
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.8s ease;
+  will-change: transform;
+}
+
+.wolf-silhouette-svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Wolf Eyes: Very faint, softly glowing purple Easter egg */
+.wolf-eyes-group {
+  opacity: 0.12;
+  filter: drop-shadow(0 0 2px rgba(168, 85, 247, 0.3));
+  animation: wolfEyeBreathe 16s ease-in-out infinite;
+}
+
+@keyframes wolfEyeBreathe {
+  0%, 18% {
+    opacity: 0.1;
+    filter: drop-shadow(0 0 2px rgba(168, 85, 247, 0.25));
+  }
+  26%, 33% {
+    opacity: 0.65;
+    filter: drop-shadow(0 0 8px rgba(192, 132, 252, 0.85)) drop-shadow(0 0 16px rgba(147, 51, 234, 0.6));
+  }
+  40%, 100% {
+    opacity: 0.1;
+    filter: drop-shadow(0 0 2px rgba(168, 85, 247, 0.25));
+  }
 }
 
 .hero-grid {
@@ -2840,6 +3042,71 @@ h1, h2, h3, h4, .brand-font {
   color: #cbd5e1;
   font-weight: 500;
   font-size: 0.78rem;
+}
+
+/* ==========================================================================
+   SECTION TRANSITIONS & ATMOSPHERIC MIST DIVIDERS
+   ========================================================================== */
+.section {
+  position: relative;
+  z-index: 2;
+}
+
+.section::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 8%;
+  right: 8%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(168, 85, 247, 0.12), rgba(192, 132, 252, 0.28), rgba(168, 85, 247, 0.12), transparent);
+  box-shadow: 0 0 14px rgba(168, 85, 247, 0.16);
+  pointer-events: none;
+}
+
+/* ==========================================================================
+   ACCESSIBILITY & RESPONSIVE BEHAVIOR
+   ========================================================================== */
+@media (prefers-reduced-motion: reduce) {
+  .ambient-orb-1,
+  .ambient-orb-2,
+  .ambient-orb-3,
+  .wolf-moonlight-glow,
+  .wolf-eyes-group,
+  .hero-wolf-img {
+    animation: none !important;
+  }
+  .ambient-glow-mouse {
+    display: none !important;
+  }
+  .wolf-silhouette-wrap {
+    transform: translateY(-50%) !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .ambient-orb-1,
+  .ambient-orb-2 {
+    filter: blur(75px);
+  }
+  .ambient-orb-3 {
+    display: none;
+  }
+  .ambient-glow-mouse {
+    display: none !important;
+  }
+  .wolf-silhouette-wrap {
+    width: 320px;
+    right: -25px;
+    opacity: 0.14;
+    transform: translateY(-50%) !important;
+  }
+  .wolf-moonlight-glow {
+    width: 380px;
+    height: 380px;
+    filter: blur(55px);
+    right: -10%;
+  }
 }
 
 
