@@ -267,13 +267,26 @@ function initScrollReveal() {
 }
 
 /* ==========================================================================
-   4. CONTACT ENQUIRY FORM (VALIDATION & HONEST SUBMISSION)
+   4. CONTACT ENQUIRY FORM (WEB3FORMS INTEGRATION)
    ========================================================================== */
 function initContactForm() {
+  // If contact.js has already initialized the form, avoid duplicate bindings
+  if (window.__HAVEN_CONTACT_FORM_INITIALIZED__) return;
+  window.__HAVEN_CONTACT_FORM_INITIALIZED__ = true;
+
   const form = document.getElementById('haven-contact-form');
   const successBox = document.getElementById('form-success-box');
+  let errorBox = document.getElementById('form-error-box');
 
   if (!form) return;
+
+  if (!errorBox && successBox && successBox.parentNode) {
+    errorBox = document.createElement('div');
+    errorBox.id = 'form-error-box';
+    errorBox.className = 'form-error-box';
+    errorBox.style.display = 'none';
+    successBox.parentNode.insertBefore(errorBox, successBox.nextSibling);
+  }
 
   const nameInput = document.getElementById('name');
   const emailInput = document.getElementById('email');
@@ -281,7 +294,10 @@ function initContactForm() {
   const templateSelect = document.getElementById('template');
   const budgetSelect = document.getElementById('budget');
   const detailsInput = document.getElementById('details');
+  const botcheckInput = form.querySelector('input[name="botcheck"]');
   const submitBtn = form.querySelector('button[type="submit"]');
+
+  let isSubmitting = false;
 
   // Clear errors on input
   [nameInput, emailInput, brandInput, detailsInput].forEach(inp => {
@@ -290,6 +306,10 @@ function initContactForm() {
         inp.style.borderColor = '';
         const existingErr = inp.parentNode.querySelector('.form-field-error');
         if (existingErr) existingErr.remove();
+        if (errorBox) {
+          errorBox.classList.remove('show');
+          errorBox.style.display = 'none';
+        }
       });
     }
   });
@@ -297,6 +317,7 @@ function initContactForm() {
   function showFieldError(inp, msg) {
     if (!inp) return;
     inp.style.borderColor = '#ef4444';
+    inp.focus();
     let err = inp.parentNode.querySelector('.form-field-error');
     if (!err) {
       err = document.createElement('div');
@@ -304,6 +325,7 @@ function initContactForm() {
       err.style.color = '#f87171';
       err.style.fontSize = '0.78rem';
       err.style.marginTop = '0.35rem';
+      err.style.fontWeight = '500';
       inp.parentNode.appendChild(err);
     }
     err.textContent = msg;
@@ -311,6 +333,18 @@ function initContactForm() {
 
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
+    if (isSubmitting) return;
+
+    if (errorBox) {
+      errorBox.classList.remove('show');
+      errorBox.style.display = 'none';
+    }
+    if (successBox) {
+      successBox.classList.remove('show');
+      successBox.style.display = 'none';
+    }
+
+    if (botcheckInput && botcheckInput.checked) return;
 
     let hasError = false;
     const name = nameInput ? nameInput.value.trim() : '';
@@ -340,80 +374,142 @@ function initContactForm() {
 
     if (hasError) return;
 
+    isSubmitting = true;
+    const originalBtnHTML = submitBtn ? submitBtn.innerHTML : 'Send Project Enquiry →';
+
     if (submitBtn) {
       submitBtn.disabled = true;
-      submitBtn.textContent = 'Transmitting Brief...';
+      submitBtn.innerHTML = `
+        <span style="display: inline-block; width: 0.95rem; height: 0.95rem; border: 2px solid rgba(255, 255, 255, 0.25); border-top-color: #ffffff; border-radius: 50%; animation: havenSpin 0.75s linear infinite; margin-right: 0.5rem; vertical-align: middle;"></span>
+        Transmitting Brief...
+      `;
     }
 
+    const budgetLabel = budgetSelect && budgetSelect.selectedOptions && budgetSelect.selectedOptions[0]
+      ? budgetSelect.selectedOptions[0].text
+      : budget;
+
+    const templateLabel = templateSelect && templateSelect.selectedOptions && templateSelect.selectedOptions[0]
+      ? templateSelect.selectedOptions[0].text
+      : template;
+
+    const structuredMessage = [
+      'New HAVEN Project Enquiry Brief:',
+      '----------------------------------------',
+      `Client Name: ${name}`,
+      `Email Address: ${email}`,
+      `Business / Brand: ${brand}`,
+      `Selected Template: ${templateLabel}`,
+      `Estimated Budget: ${budgetLabel}`,
+      '',
+      'Project Details:',
+      details,
+      '----------------------------------------',
+      `Submitted: ${new Date().toISOString()}`
+    ].join('\n');
+
     const payload = {
-      clientInfo: { name, email, phone: '', country: '', city: '' },
-      business: { businessName: brand, businessType: 'Web Project', existingWebsite: '' },
-      project: { websiteType: 'Boutique Website', projectType: template !== 'Custom Vision' ? 'Template System' : 'Custom Build', template, pages: [], features: [], hosting: 'Yes', domain: 'Yes' },
-      budgetTimeline: { budget, timeline: '2–4 weeks' },
-      design: { style: 'Dark cinematic & minimal', brandColors: 'HAVEN Palette', referenceWebsites: '' },
-      additionalRequirements: details,
-      transcript: []
+      access_key: '0e2c5bcb-d228-4cd4-801b-8528e9d002e7',
+      subject: 'New HAVEN Website Inquiry',
+      from_name: 'HAVEN Website Contact Form',
+      name,
+      email,
+      replyto: email,
+      brand,
+      template: templateLabel,
+      budget: budgetLabel,
+      details,
+      message: structuredMessage,
+      'Business / Brand': brand,
+      'Selected Template': templateLabel,
+      'Estimated Budget': budgetLabel,
+      'Project Details': details
     };
 
-    // Store in localStorage for client record
     try {
       const past = JSON.parse(localStorage.getItem('haven_enquiries') || '[]');
       past.push({ name, email, brand, template, budget, details, timestamp: new Date().toISOString() });
       localStorage.setItem('haven_enquiries', JSON.stringify(past));
     } catch (_) {}
 
-    const apiBase = (typeof window !== 'undefined' && window.location && window.location.origin && !window.location.origin.includes('YOUR_BACKEND_URL')) ? window.location.origin : '';
-    let submittedViaApi = false;
-    let refId = `HVN-${Date.now().toString(36).toUpperCase()}`;
-
     try {
-      const res = await fetch(`${apiBase}/api/submit-enquiry`, {
+      const res = await fetch('https://api.web3forms.com/submit', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
         body: JSON.stringify(payload)
       });
-      if (res.ok) {
-        const data = await res.json();
-        if (data.success) {
-          submittedViaApi = true;
-          if (data.referenceId) refId = data.referenceId;
+      const data = await res.json().catch(() => null);
+
+      if (res.ok && data && (data.success === true || res.status === 200)) {
+        if (successBox) {
+          successBox.innerHTML = `
+            <div style="font-size: 1.2rem; font-weight: 700; margin-bottom: 0.4rem; color: #bbf7d0; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+              <span>Project Enquiry Received</span>
+            </div>
+            <div style="font-family: var(--font-mono); font-size: 0.78rem; color: var(--accent-lavender); margin-bottom: 0.85rem; letter-spacing: 0.08em;">
+              CONFIRMED TRANSMISSION &bull; STATUS: 200 OK
+            </div>
+            <p style="font-size: 0.92rem; color: #e2e8f0; line-height: 1.6; margin: 0 auto; max-width: 540px;">
+              Thank you, <strong>${escapeHtml(name)}</strong>. Your enquiry for <strong>${escapeHtml(brand)}</strong> has been delivered directly to HAVEN studio engineers. We review every brief and reply to <strong>${escapeHtml(email)}</strong> within 24 hours.
+            </p>
+          `;
+          successBox.style.display = 'block';
+          successBox.classList.add('show');
+          form.reset();
+          successBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+      } else {
+        const errorMsg = data && data.message ? data.message : 'Unable to transmit enquiry. Please try again.';
+        if (errorBox) {
+          errorBox.innerHTML = `
+            <div style="display: flex; align-items: center; justify-content: center; gap: 0.5rem; font-size: 1.05rem; font-weight: 700; margin-bottom: 0.4rem; color: #fca5a5;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="8" x2="12" y2="12"></line>
+                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+              </svg>
+              <span>Submission Error</span>
+            </div>
+            <p style="font-size: 0.9rem; color: #fecaca; line-height: 1.5; margin: 0 auto; max-width: 560px;">
+              ${escapeHtml(errorMsg)}
+            </p>
+            <div style="font-size: 0.78rem; color: #cbd5e1; margin-top: 0.6rem;">
+              Direct studio contact: <a href="mailto:hello.havenweb@gmail.com" style="color: var(--accent-lavender); text-decoration: underline;">hello.havenweb@gmail.com</a>
+            </div>
+          `;
+          errorBox.style.display = 'block';
+          errorBox.classList.add('show');
+          errorBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         }
       }
-    } catch (_) {
-      // Offline or static host without active Node backend
-    }
-
-    if (submitBtn) {
-      submitBtn.disabled = false;
-      submitBtn.textContent = 'Send Project Enquiry →';
-    }
-
-    if (successBox) {
-      if (submittedViaApi) {
-        successBox.innerHTML = `
-          <div style="font-size: 1.2rem; font-weight: 700; margin-bottom: 0.5rem; color: #bbf7d0;">
-            ✓ Project Enquiry Confirmed
+    } catch (err) {
+      if (errorBox) {
+        errorBox.innerHTML = `
+          <div style="display: flex; align-items: center; justify-content: center; gap: 0.5rem; font-size: 1.05rem; font-weight: 700; margin-bottom: 0.4rem; color: #fca5a5;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="8" x2="12" y2="12"></line>
+              <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
+            <span>Network Disruption</span>
           </div>
-          <div style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--accent-lavender); margin-bottom: 0.75rem;">
-            REFERENCE: ${escapeHtml(refId)}
-          </div>
-          <p style="font-size: 0.95rem; color: #e2e8f0; line-height: 1.6;">
-            Thank you, <strong>${escapeHtml(name)}</strong>. Your project brief for <strong>${escapeHtml(brand)}</strong> has been registered with the HAVEN engineering team. We review all submissions and reply to <strong>${escapeHtml(email)}</strong> within 24 hours.
+          <p style="font-size: 0.9rem; color: #fecaca; line-height: 1.5; margin: 0 auto; max-width: 560px;">
+            Network connection interrupted while transmitting your enquiry. Your brief remains saved below. Please check your connection and click Send again, or email us directly at hello.havenweb@gmail.com.
           </p>
         `;
-      } else {
-        successBox.innerHTML = `
-          <div style="font-size: 1.2rem; font-weight: 700; margin-bottom: 0.5rem; color: #bbf7d0;">
-            ✓ Brief Prepared &amp; Saved
-          </div>
-          <p style="font-size: 0.95rem; color: #e2e8f0; line-height: 1.6;">
-            Thank you, <strong>${escapeHtml(name)}</strong>. Your project enquiry for <strong>${escapeHtml(brand)}</strong> has been captured. For immediate priority review, you can also reach us directly at <a href="mailto:hello.havenweb@gmail.com" style="color: var(--accent-lavender); text-decoration: underline;">hello.havenweb@gmail.com</a>.
-          </p>
-        `;
+        errorBox.style.display = 'block';
+        errorBox.classList.add('show');
+        errorBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
       }
-      successBox.classList.add('show');
-      form.reset();
-      successBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    } finally {
+      isSubmitting = false;
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalBtnHTML;
+      }
     }
   });
 }

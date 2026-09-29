@@ -1626,6 +1626,32 @@ h1, h2, h3, h4, .brand-font {
   animation: fadeIn 0.4s ease;
 }
 
+/* Dynamic form error notification banner */
+.form-error-box {
+  display: none;
+  background: rgba(127, 29, 29, 0.25);
+  border: 1px solid rgba(248, 113, 113, 0.4);
+  color: #fecaca;
+  padding: 1.25rem 1.5rem;
+  border-radius: var(--radius-md);
+  margin-top: 1.5rem;
+  text-align: center;
+}
+
+.form-error-box.show {
+  display: block;
+  animation: fadeIn 0.4s ease;
+}
+
+@keyframes havenSpin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 /* ==========================================================================
    LEGAL PAGES (PRIVACY / TERMS)
    ========================================================================== */

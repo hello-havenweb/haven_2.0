@@ -117,6 +117,12 @@
           </div>
 
           <form id="haven-contact-form">
+            <!-- Web3Forms Configuration -->
+            <input type="hidden" name="access_key" value="0e2c5bcb-d228-4cd4-801b-8528e9d002e7">
+            <input type="hidden" name="subject" value="New HAVEN Website Inquiry">
+            <input type="hidden" name="from_name" value="HAVEN Website Contact Form">
+            <input type="checkbox" name="botcheck" class="hidden" style="display: none;">
+
             <div class="form-grid">
 
               <!-- Name -->
@@ -181,6 +187,9 @@
 
           <!-- Dynamic Success Message Container -->
           <div id="form-success-box" class="form-success-box"></div>
+
+          <!-- Dynamic Error Message Container -->
+          <div id="form-error-box" class="form-error-box" style="display: none;"></div>
         </div>
 
       </div>
@@ -255,5 +264,6 @@
   </a>
 
   <script src="script.js" defer></script>
+  <script src="contact.js" defer></script>
 </body>
 </html>
