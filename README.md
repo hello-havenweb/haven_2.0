@@ -46,7 +46,7 @@ RESEND_API_KEY=re_your_resend_api_key_here
 
 # 3. Studio Owner Email
 # Verified recipient for inbound project briefs
-HAVEN_OWNER_EMAIL=hello@havenweb.studio
+HAVEN_OWNER_EMAIL=hello.havenweb@gmail.com
 
 # 4. Server Port (Default: 3000)
 PORT=3000

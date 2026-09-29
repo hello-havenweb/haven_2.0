@@ -230,7 +230,7 @@ function initScrollReveal() {
 }
 
 /* ==========================================================================
-   4. CONTACT ENQUIRY FORM (LOCAL SUCCESS NOTIFICATION)
+   4. CONTACT ENQUIRY FORM (VALIDATION & HONEST SUBMISSION)
    ========================================================================== */
 function initContactForm() {
   const form = document.getElementById('haven-contact-form');
@@ -238,40 +238,142 @@ function initContactForm() {
 
   if (!form) return;
 
-  form.addEventListener('submit', (e) => {
+  const nameInput = document.getElementById('name');
+  const emailInput = document.getElementById('email');
+  const brandInput = document.getElementById('brand');
+  const templateSelect = document.getElementById('template');
+  const budgetSelect = document.getElementById('budget');
+  const detailsInput = document.getElementById('details');
+  const submitBtn = form.querySelector('button[type="submit"]');
+
+  // Clear errors on input
+  [nameInput, emailInput, brandInput, detailsInput].forEach(inp => {
+    if (inp) {
+      inp.addEventListener('input', () => {
+        inp.style.borderColor = '';
+        const existingErr = inp.parentNode.querySelector('.form-field-error');
+        if (existingErr) existingErr.remove();
+      });
+    }
+  });
+
+  function showFieldError(inp, msg) {
+    if (!inp) return;
+    inp.style.borderColor = '#ef4444';
+    let err = inp.parentNode.querySelector('.form-field-error');
+    if (!err) {
+      err = document.createElement('div');
+      err.className = 'form-field-error';
+      err.style.color = '#f87171';
+      err.style.fontSize = '0.78rem';
+      err.style.marginTop = '0.35rem';
+      inp.parentNode.appendChild(err);
+    }
+    err.textContent = msg;
+  }
+
+  form.addEventListener('submit', async (e) => {
     e.preventDefault();
 
-    const name = (document.getElementById('name') || {}).value || 'Client';
-    const email = (document.getElementById('email') || {}).value || '';
-    const brand = (document.getElementById('brand') || {}).value || '';
-    const template = (document.getElementById('template') || {}).value || 'Bespoke';
+    let hasError = false;
+    const name = nameInput ? nameInput.value.trim() : '';
+    const email = emailInput ? emailInput.value.trim() : '';
+    const brand = brandInput ? brandInput.value.trim() : '';
+    const template = templateSelect ? templateSelect.value : 'Custom Vision';
+    const budget = budgetSelect ? budgetSelect.value : 'TemplateWebsite';
+    const details = detailsInput ? detailsInput.value.trim() : '';
 
-    // Store in localStorage for client record
-    const enquiry = {
-      name,
-      email,
-      brand,
-      template,
-      timestamp: new Date().toISOString()
+    if (!name) {
+      showFieldError(nameInput, 'Please enter your name.');
+      hasError = true;
+    }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!email || !emailRegex.test(email)) {
+      showFieldError(emailInput, 'Please enter a valid email address.');
+      hasError = true;
+    }
+    if (!brand) {
+      showFieldError(brandInput, 'Please provide your business or brand name.');
+      hasError = true;
+    }
+    if (!details || details.length < 10) {
+      showFieldError(detailsInput, 'Please provide a brief description of your project (at least 10 characters).');
+      hasError = true;
+    }
+
+    if (hasError) return;
+
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Transmitting Brief...';
+    }
+
+    const payload = {
+      clientInfo: { name, email, phone: '', country: '', city: '' },
+      business: { businessName: brand, businessType: 'Web Project', existingWebsite: '' },
+      project: { websiteType: 'Boutique Website', projectType: template !== 'Custom Vision' ? 'Template System' : 'Custom Build', template, pages: [], features: [], hosting: 'Yes', domain: 'Yes' },
+      budgetTimeline: { budget, timeline: '2–4 weeks' },
+      design: { style: 'Dark cinematic & minimal', brandColors: 'HAVEN Palette', referenceWebsites: '' },
+      additionalRequirements: details,
+      transcript: []
     };
 
+    // Store in localStorage for client record
     try {
       const past = JSON.parse(localStorage.getItem('haven_enquiries') || '[]');
-      past.push(enquiry);
+      past.push({ name, email, brand, template, budget, details, timestamp: new Date().toISOString() });
       localStorage.setItem('haven_enquiries', JSON.stringify(past));
     } catch (_) {}
 
-    // Show dynamic success confirmation
+    const apiBase = (typeof window !== 'undefined' && window.location && window.location.origin && !window.location.origin.includes('YOUR_BACKEND_URL')) ? window.location.origin : '';
+    let submittedViaApi = false;
+    let refId = `HVN-${Date.now().toString(36).toUpperCase()}`;
+
+    try {
+      const res = await fetch(`${apiBase}/api/submit-enquiry`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success) {
+          submittedViaApi = true;
+          if (data.referenceId) refId = data.referenceId;
+        }
+      }
+    } catch (_) {
+      // Offline or static host without active Node backend
+    }
+
+    if (submitBtn) {
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Send Project Enquiry →';
+    }
+
     if (successBox) {
-      successBox.innerHTML = `
-        <div style="font-size: 1.25rem; font-weight: 700; margin-bottom: 0.5rem; color: #bbf7d0;">
-          Enquiry Received, ${escapeHtml(name)}
-        </div>
-        <p style="font-size: 0.95rem; color: #e2e8f0; line-height: 1.6;">
-          Thank you for reaching out regarding <strong>${escapeHtml(brand || 'your project')}</strong> with the <strong>${escapeHtml(template)}</strong> aesthetic.
-          Our creative director will review your brief and contact you within 24 hours.
-        </p>
-      `;
+      if (submittedViaApi) {
+        successBox.innerHTML = `
+          <div style="font-size: 1.2rem; font-weight: 700; margin-bottom: 0.5rem; color: #bbf7d0;">
+            ✓ Project Enquiry Confirmed
+          </div>
+          <div style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--accent-lavender); margin-bottom: 0.75rem;">
+            REFERENCE: ${escapeHtml(refId)}
+          </div>
+          <p style="font-size: 0.95rem; color: #e2e8f0; line-height: 1.6;">
+            Thank you, <strong>${escapeHtml(name)}</strong>. Your project brief for <strong>${escapeHtml(brand)}</strong> has been registered with the HAVEN engineering team. We review all submissions and reply to <strong>${escapeHtml(email)}</strong> within 24 hours.
+          </p>
+        `;
+      } else {
+        successBox.innerHTML = `
+          <div style="font-size: 1.2rem; font-weight: 700; margin-bottom: 0.5rem; color: #bbf7d0;">
+            ✓ Brief Prepared &amp; Saved
+          </div>
+          <p style="font-size: 0.95rem; color: #e2e8f0; line-height: 1.6;">
+            Thank you, <strong>${escapeHtml(name)}</strong>. Your project enquiry for <strong>${escapeHtml(brand)}</strong> has been captured. For immediate priority review, you can also reach us directly at <a href="mailto:hello.havenweb@gmail.com" style="color: var(--accent-lavender); text-decoration: underline;">hello.havenweb@gmail.com</a>.
+          </p>
+        `;
+      }
       successBox.classList.add('show');
       form.reset();
       successBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
@@ -490,6 +592,43 @@ function initParallaxEffects() {
     if (!rafId) {
       rafId = requestAnimationFrame(updateParallax);
     }
+  });
+}
+
+/* ==========================================================================
+   7b. CURRENCY TOGGLE (PKR / USD)
+   ========================================================================== */
+function initCurrencyToggle() {
+  const toggleBtns = document.querySelectorAll('.currency-btn');
+  const cards = document.querySelectorAll('.pricing-mini-card[data-pkr-price]');
+  if (!toggleBtns.length || !cards.length) return;
+
+  function setCurrency(curr) {
+    toggleBtns.forEach(btn => {
+      const isActive = btn.dataset.currency === curr;
+      btn.classList.toggle('active', isActive);
+      btn.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+    });
+
+    cards.forEach(card => {
+      const priceEl = card.querySelector('.pkg-price');
+      const subEl = card.querySelector('.pkg-price-sub');
+
+      if (curr === 'usd') {
+        if (priceEl && card.dataset.usdPrice) priceEl.textContent = card.dataset.usdPrice;
+        if (subEl && card.dataset.usdSub) subEl.textContent = card.dataset.usdSub;
+      } else {
+        if (priceEl && card.dataset.pkrPrice) priceEl.textContent = card.dataset.pkrPrice;
+        if (subEl && card.dataset.pkrSub) subEl.textContent = card.dataset.pkrSub;
+      }
+    });
+  }
+
+  toggleBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const curr = btn.dataset.currency;
+      if (curr) setCurrency(curr);
+    });
   });
 }
 
@@ -882,7 +1021,7 @@ function initHavenAI() {
       } else throw new Error(resData.error || 'Server rejected enquiry submission');
     } catch (err) {
       console.error('[HAVEN AI] Submission error:', err);
-      alert('Your enquiry could not be sent right now. Please try again or reach out directly at hello@havenweb.studio.');
+      alert('Your enquiry could not be sent right now. Please try again or reach out directly at hello.havenweb@gmail.com.');
     } finally { sendEnquiryBtn.disabled = false; sendEnquiryBtn.textContent = 'SEND ENQUIRY →'; }
   }
 

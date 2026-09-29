@@ -2815,4 +2815,31 @@ h1, h2, h3, h4, .brand-font {
   }
 }
 
+/* Template Card Included Pages Breakdown */
+.template-included-pages {
+  margin: 0.85rem 0 1.15rem;
+  padding: 0.6rem 0.85rem;
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid rgba(168, 85, 247, 0.12);
+  border-radius: var(--radius-sm);
+  font-size: 0.8rem;
+  line-height: 1.5;
+}
+
+.template-included-pages .included-label {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  color: var(--accent-lilac);
+  letter-spacing: 0.05em;
+  margin-bottom: 0.25rem;
+}
+
+.template-included-pages .included-list {
+  color: #cbd5e1;
+  font-weight: 500;
+  font-size: 0.78rem;
+}
+
 

@@ -370,7 +370,7 @@ app.post('/api/submit-enquiry', async (req: Request, res: Response) => {
     }
 
     const referenceId = `HVN-${Date.now().toString(36).toUpperCase()}-${Math.floor(Math.random() * 899 + 100)}`;
-    const ownerEmail = process.env.HAVEN_OWNER_EMAIL || 'hello@havenweb.studio';
+    const ownerEmail = process.env.HAVEN_OWNER_EMAIL || 'hello.havenweb@gmail.com';
     const resendApiKey = process.env.RESEND_API_KEY || '';
 
     // Email Body (Plaintext and HTML)
@@ -446,7 +446,7 @@ app.post('/api/submit-enquiry', async (req: Request, res: Response) => {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            from: 'HAVEN AI <enquiries@havenweb.studio>',
+            from: process.env.RESEND_FROM_EMAIL || 'HAVEN <onboarding@resend.dev>',
             to: [ownerEmail],
             reply_to: email,
             subject: subject,
@@ -482,7 +482,7 @@ app.post('/api/submit-enquiry', async (req: Request, res: Response) => {
     console.error('[HAVEN AI] /api/submit-enquiry error:', err);
     return res.status(500).json({
       success: false,
-      error: 'Unable to submit your project enquiry at this time. Please try again or reach us at hello@havenweb.studio.',
+      error: 'Unable to submit your project enquiry at this time. Please try again or reach us at hello.havenweb@gmail.com.',
     });
   }
 });

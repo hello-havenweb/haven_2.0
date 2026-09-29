@@ -19,6 +19,7 @@ export default defineConfig(() => {
           contact: resolve(__dirname, 'contact.html'),
           privacy: resolve(__dirname, 'privacy.html'),
           terms: resolve(__dirname, 'terms.html'),
+          notFound: resolve(__dirname, '404.html'),
           nexus: resolve(__dirname, 'templates/nexus.html'),
           nexusTeam: resolve(__dirname, 'templates/nexus-team.html'),
           nexusGames: resolve(__dirname, 'templates/nexus-games.html'),

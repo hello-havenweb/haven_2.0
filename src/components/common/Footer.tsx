@@ -43,7 +43,7 @@ export const Footer: React.FC = () => {
             <div className="pt-2 flex flex-col gap-2 text-xs">
               <div className="flex items-center gap-2">
                 <Mail className="w-3.5 h-3.5 text-purple-400" />
-                <span>inquiries@havenstudio.design</span>
+                <span>hello.havenweb@gmail.com</span>
               </div>
               <div className="flex items-center gap-2">
                 <MapPin className="w-3.5 h-3.5 text-purple-400" />
