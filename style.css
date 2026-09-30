@@ -315,6 +315,17 @@ h1, h2, h3, h4, .brand-font {
   position: relative;
 }
 
+.section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 6%;
+  right: 6%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(168, 85, 247, 0.2), transparent);
+  pointer-events: none;
+}
+
 .section-header {
   margin-bottom: 3.5rem;
 }
@@ -1812,13 +1823,69 @@ h1, h2, h3, h4, .brand-font {
    ========================================================================== */
 .reveal {
   opacity: 0;
-  transform: translateY(24px);
-  transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+  transform: translateY(28px) scale(0.985);
+  filter: blur(4px);
+  transition: opacity 0.85s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.85s cubic-bezier(0.16, 1, 0.3, 1),
+              filter 0.85s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform, filter;
 }
 
 .reveal.active {
   opacity: 1;
-  transform: translateY(0);
+  transform: translateY(0) scale(1);
+  filter: blur(0);
+}
+
+/* Stagger delays for card grids */
+.stagger-1 { transition-delay: 0.08s; }
+.stagger-2 { transition-delay: 0.16s; }
+.stagger-3 { transition-delay: 0.24s; }
+.stagger-4 { transition-delay: 0.32s; }
+.stagger-5 { transition-delay: 0.40s; }
+.stagger-6 { transition-delay: 0.48s; }
+
+/* Cinematic Headline Entrance */
+.hero-title-cinematic {
+  animation: heroTitleCinematicReveal 1.1s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes heroTitleCinematicReveal {
+  0% {
+    opacity: 0;
+    transform: translateY(22px);
+    filter: blur(8px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+}
+
+/* Section divider subtle ambient shimmer */
+.section-divider-shimmer {
+  position: relative;
+  overflow: hidden;
+}
+
+.section-divider-shimmer::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -60%;
+  width: 50%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(192, 132, 252, 0.65), transparent);
+  animation: sectionShimmerSweep 9s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes sectionShimmerSweep {
+  0%, 25% { left: -60%; opacity: 0; }
+  35% { opacity: 1; }
+  65% { left: 120%; opacity: 1; }
+  75%, 100% { left: 120%; opacity: 0; }
 }
 
 @keyframes fadeIn {
@@ -1836,6 +1903,13 @@ h1, h2, h3, h4, .brand-font {
   .reveal {
     opacity: 1 !important;
     transform: none !important;
+    filter: none !important;
+    transition: none !important;
+  }
+  .hero-title-cinematic {
+    animation: none !important;
+    opacity: 1 !important;
+    filter: none !important;
   }
 }
 
@@ -3133,6 +3207,209 @@ h1, h2, h3, h4, .brand-font {
 }
 
 /* ==========================================================================
+   PREMIUM MOTION & INTERACTION SYSTEM (DESKTOP PRECISION • GPU ACCELERATED)
+   ========================================================================== */
+
+/* 1. SCROLL PROGRESS INDICATOR */
+.haven-scroll-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 2.5px;
+  z-index: 10001;
+  pointer-events: none;
+  background: transparent;
+}
+
+.haven-scroll-progress-bar {
+  height: 100%;
+  width: 100%;
+  background: linear-gradient(90deg, #7c3aed 0%, #a855f7 35%, #c084fc 70%, #f3e8ff 100%);
+  box-shadow: 0 0 10px rgba(192, 132, 252, 0.75), 0 0 20px rgba(168, 85, 247, 0.45);
+  transform-origin: left center;
+  transform: scaleX(0);
+  will-change: transform;
+}
+
+/* 2. CUSTOM CURSOR SYSTEM */
+.haven-cursor-dot {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow: 0 0 10px rgba(192, 132, 252, 0.95), 0 0 18px rgba(168, 85, 247, 0.65);
+  pointer-events: none;
+  z-index: 100000;
+  will-change: transform, opacity;
+  transform: translate3d(-100px, -100px, 0);
+  opacity: 0;
+  transition: opacity 0.3s ease, background 0.2s ease;
+}
+
+.haven-cursor-ring {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(192, 132, 252, 0.55);
+  box-shadow: 0 0 14px rgba(168, 85, 247, 0.22);
+  pointer-events: none;
+  z-index: 99999;
+  will-change: transform, width, height, border-color, box-shadow, opacity;
+  transform: translate3d(-100px, -100px, 0);
+  opacity: 0;
+  transition: opacity 0.35s ease, width 0.25s cubic-bezier(0.16, 1, 0.3, 1), height 0.25s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
+}
+
+/* Cursor trail points (5-8 lightweight points, smooth fade) */
+.haven-cursor-trail-dot {
+  position: fixed;
+  top: 0;
+  left: 0;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 99998;
+  will-change: transform, opacity;
+  transform: translate3d(-100px, -100px, 0);
+  opacity: 0;
+  background: radial-gradient(circle, rgba(192, 132, 252, 0.85) 0%, rgba(147, 51, 234, 0.35) 60%, transparent 100%);
+  transition: opacity 0.4s ease;
+}
+
+/* Cursor active states on interactive elements */
+.haven-cursor-ring.cursor-active {
+  width: 52px;
+  height: 52px;
+  border-color: rgba(233, 213, 255, 0.9);
+  background: rgba(168, 85, 247, 0.08);
+  box-shadow: 0 0 24px rgba(168, 85, 247, 0.45), inset 0 0 12px rgba(192, 132, 252, 0.18);
+}
+
+.haven-cursor-dot.cursor-active {
+  background: #f3e8ff;
+  box-shadow: 0 0 14px rgba(233, 213, 255, 1);
+  transform: translate3d(-100px, -100px, 0) scale(0.8);
+}
+
+.haven-cursor-ring.cursor-clicked {
+  width: 26px;
+  height: 26px;
+  border-color: #ffffff;
+  background: rgba(192, 132, 252, 0.28);
+  box-shadow: 0 0 20px rgba(192, 132, 252, 0.85);
+}
+
+/* 3. MOUSE FOLLOWING AMBIENT LIGHT */
+.haven-ambient-mouse-glow {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 480px;
+  height: 480px;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 0;
+  background: radial-gradient(circle, rgba(168, 85, 247, 0.065) 0%, rgba(126, 34, 206, 0.02) 45%, transparent 70%);
+  transform: translate3d(-500px, -500px, 0);
+  opacity: 0;
+  will-change: transform, opacity;
+  transition: opacity 0.6s ease;
+  mix-blend-mode: screen;
+}
+
+/* 4. MAGNETIC BUTTONS */
+.btn-magnetic {
+  will-change: transform;
+  transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.22s ease;
+}
+
+.btn-magnetic-inner {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  will-change: transform;
+  transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* 5. 3D CARD TILT & RADIAL HIGHLIGHT (Max 3-5° tilt, subtle reflection) */
+.tilt-card {
+  position: relative;
+  will-change: transform;
+  transform-style: preserve-3d;
+  transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s ease, border-color 0.25s ease;
+}
+
+/* Radial light border shimmer following cursor */
+.tilt-card::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  padding: 1px;
+  background: radial-gradient(350px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(192, 132, 252, 0.45), transparent 60%);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: 2;
+}
+
+/* Radial reflection inside card following cursor */
+.tilt-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(420px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(168, 85, 247, 0.08), transparent 70%);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: 1;
+}
+
+.tilt-card:hover::before,
+.tilt-card:hover::after {
+  opacity: 1;
+}
+
+/* 6. ENHANCED WOLF MASCOT HERO INTERACTIONS */
+.wolf-silhouette-wrap {
+  transition: opacity 0.4s ease;
+}
+
+.wolf-silhouette-wrap.wolf-gaze-active {
+  opacity: 0.24;
+}
+
+.wolf-eyes-group {
+  transition: opacity 0.4s ease, filter 0.4s ease;
+}
+
+.wolf-eyes-group.eye-gleam {
+  opacity: 0.95 !important;
+  filter: drop-shadow(0 0 10px rgba(192, 132, 252, 0.95)) drop-shadow(0 0 20px rgba(168, 85, 247, 0.7)) !important;
+}
+
+.split-viewer-card:hover .hero-wolf-img {
+  transform: scale(1.025) translateY(-3px);
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.split-viewer-card:hover .wolf-atmosphere-glow {
+  opacity: 1;
+  background: radial-gradient(circle at 65% 50%, rgba(192, 132, 252, 0.32) 0%, rgba(147, 51, 234, 0.14) 45%, transparent 72%);
+  transition: opacity 0.5s ease, background 0.5s ease;
+}
+
+/* ==========================================================================
    ACCESSIBILITY & RESPONSIVE BEHAVIOR
    ========================================================================== */
 @media (prefers-reduced-motion: reduce) {
@@ -3145,8 +3422,23 @@ h1, h2, h3, h4, .brand-font {
   .wolf-moonlight-glow,
   .wolf-silhouette-wrap,
   .wolf-eyes-group,
-  .hero-wolf-img {
+  .hero-wolf-img,
+  .section-divider-shimmer::after {
     animation: none !important;
+  }
+  .haven-cursor-dot,
+  .haven-cursor-ring,
+  .haven-cursor-trail-dot,
+  .haven-ambient-mouse-glow,
+  .tilt-card::before,
+  .tilt-card::after {
+    display: none !important;
+  }
+  .tilt-card,
+  .btn-magnetic,
+  .wolf-silhouette-wrap {
+    transform: none !important;
+    transition: none !important;
   }
   .ambient-particles-container {
     display: none !important;

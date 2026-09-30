@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initContactForm();
   initTemplateFilters();
   initCurrencyToggle();
-  initParallaxEffects();
+  initCinematicInteractions();
   autoSelectTemplateFromUrl();
   initHavenAI();
 });
@@ -246,6 +246,17 @@ function initScrollReveal() {
   const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const reveals = document.querySelectorAll('.reveal');
 
+  // Stagger delays for card grids
+  const gridContainers = document.querySelectorAll(
+    '.pillars-grid, .templates-grid, .process-grid, .play-games-grid, .pricing-grid, .hero-trust, .values-grid'
+  );
+  gridContainers.forEach(grid => {
+    Array.from(grid.children).forEach((child, idx) => {
+      const delay = Math.min(0.48, (idx % 6) * 0.08);
+      child.style.transitionDelay = `${delay}s`;
+    });
+  });
+
   if (prefersReduced || !('IntersectionObserver' in window)) {
     reveals.forEach(el => el.classList.add('active'));
     return;
@@ -259,7 +270,7 @@ function initScrollReveal() {
       }
     });
   }, {
-    threshold: 0.1,
+    threshold: 0.08,
     rootMargin: '0px 0px -40px 0px'
   });
 
@@ -633,12 +644,393 @@ function autoSelectTemplateFromUrl() {
 }
 
 /* ==========================================================================
-   7. MOTION & SCROLL DISCIPLINE
-   Decorative animations are strictly GPU-accelerated CSS to keep scrolling 100% smooth.
+   7. PREMIUM CINEMATIC MOTION & INTERACTION SYSTEM
+   GPU-Accelerated • 60+ FPS • Lightweight Native RAF • Accessibility-First
    ========================================================================== */
-function initParallaxEffects() {
-  // Purposely empty: prevents any mousemove JS event overhead during scroll
-  // and ensures cards, text, and content never shift or lag.
+function initCinematicInteractions() {
+  const isReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const isTouch = window.matchMedia('(pointer: coarse)').matches || 
+                  ('ontouchstart' in window) || 
+                  (navigator.maxTouchPoints > 0 && window.innerWidth <= 1024);
+
+  // 1. Scroll Progress Bar (Universal across desktop & mobile)
+  initScrollProgressBar();
+
+  // 2. Headline Cinematic Entrance
+  initHeadlineCinematicReveals();
+
+  // On touch screens or reduced-motion preference, strictly bypass mouse-tracking systems
+  if (isTouch || isReduced) {
+    return;
+  }
+
+  // Desktop Luxury Interaction Suite
+  initDesktopPointerSystem();
+}
+
+/**
+ * Universal Luxury Viewport Top Scroll Progress Indicator
+ */
+function initScrollProgressBar() {
+  if (document.querySelector('.haven-scroll-progress')) return;
+
+  const wrap = document.createElement('div');
+  wrap.className = 'haven-scroll-progress';
+  wrap.setAttribute('aria-hidden', 'true');
+
+  const bar = document.createElement('div');
+  bar.className = 'haven-scroll-progress-bar';
+  wrap.appendChild(bar);
+  document.body.prepend(wrap);
+
+  let ticking = false;
+  function updateProgress() {
+    const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+    const progress = docHeight > 0 ? Math.min(1, Math.max(0, window.scrollY / docHeight)) : 0;
+    bar.style.transform = `scaleX(${progress.toFixed(4)})`;
+    ticking = false;
+  }
+
+  window.addEventListener('scroll', () => {
+    if (!ticking) {
+      window.requestAnimationFrame(updateProgress);
+      ticking = true;
+    }
+  }, { passive: true });
+
+  updateProgress();
+}
+
+/**
+ * Subtle Blur-to-Sharp Cinematic Entrance for Major Hero Headings
+ */
+function initHeadlineCinematicReveals() {
+  const heroTitles = document.querySelectorAll('.hero-title');
+  heroTitles.forEach(title => {
+    title.classList.add('hero-title-cinematic');
+  });
+}
+
+/**
+ * Desktop Precision Pointer Engine:
+ * - Fluid Dual-Ring Cursor
+ * - Fading Ambient Trail
+ * - Mouse-Following Atmospheric Glow
+ * - Magnetic CTA Buttons
+ * - 3D Perspective Card Tilt with Radial Highlight
+ * - Responsive Wolf Mascot Gaze & Proximity Eye Gleam
+ */
+function initDesktopPointerSystem() {
+  document.body.classList.add('haven-custom-cursor-ready');
+
+  // Custom Cursor Dot (Center point)
+  const cursorDot = document.createElement('div');
+  cursorDot.className = 'haven-cursor-dot';
+  cursorDot.setAttribute('aria-hidden', 'true');
+
+  // Custom Cursor Ring (Fluid trailing orbit)
+  const cursorRing = document.createElement('div');
+  cursorRing.className = 'haven-cursor-ring';
+  cursorRing.setAttribute('aria-hidden', 'true');
+
+  // Ambient Mouse Glow (Soft radial illumination behind content)
+  const mouseGlow = document.createElement('div');
+  mouseGlow.className = 'haven-ambient-mouse-glow';
+  mouseGlow.setAttribute('aria-hidden', 'true');
+
+  // Trail Points (6 lightweight points, gentle opacity decay)
+  const TRAIL_COUNT = 6;
+  const trailDots = [];
+  const trailFrag = document.createDocumentFragment();
+
+  for (let i = 0; i < TRAIL_COUNT; i++) {
+    const dot = document.createElement('div');
+    dot.className = 'haven-cursor-trail-dot';
+    dot.setAttribute('aria-hidden', 'true');
+    const size = Math.max(2, 5 - i * 0.6);
+    const targetOpacity = (0.32 - i * 0.045).toFixed(2);
+    dot.style.width = `${size}px`;
+    dot.style.height = `${size}px`;
+    dot.style.opacity = '0';
+    trailDots.push({ el: dot, x: -100, y: -100, targetOpacity, size });
+    trailFrag.appendChild(dot);
+  }
+
+  document.body.appendChild(mouseGlow);
+  document.body.appendChild(cursorDot);
+  document.body.appendChild(cursorRing);
+  document.body.appendChild(trailFrag);
+
+  // Position & Interpolation Coordinates
+  let mouseX = -100;
+  let mouseY = -100;
+  let dotX = -100;
+  let dotY = -100;
+  let ringX = -100;
+  let ringY = -100;
+  let glowX = -500;
+  let glowY = -500;
+  let isMouseInView = false;
+  let isHoveringInteractive = false;
+
+  // Wolf Mascot Interaction Elements
+  const wolfSilhouette = document.getElementById('wolf-parallax-target');
+  const wolfEyes = document.querySelector('.wolf-eyes-group');
+  const wolfMoonlight = document.querySelector('.wolf-moonlight-glow');
+  let wolfTargetX = 0;
+  let wolfTargetY = 0;
+  let wolfTargetRot = 0;
+  let wolfCurX = 0;
+  let wolfCurY = 0;
+  let wolfCurRot = 0;
+
+  // RAF Ticker Controller
+  let rafId = null;
+  let isRunning = true;
+
+  // Track Mouse Position
+  window.addEventListener('mousemove', (e) => {
+    mouseX = e.clientX;
+    mouseY = e.clientY;
+
+    if (!isMouseInView) {
+      isMouseInView = true;
+      cursorDot.style.opacity = '1';
+      cursorRing.style.opacity = '1';
+      mouseGlow.style.opacity = '1';
+      trailDots.forEach(t => t.el.style.opacity = t.targetOpacity);
+    }
+
+    // Wolf Mascot Interactive Response
+    if (wolfSilhouette) {
+      const normX = (mouseX / window.innerWidth) - 0.5;
+      const normY = (mouseY / window.innerHeight) - 0.5;
+      wolfTargetX = normX * 16;
+      wolfTargetY = normY * 10;
+      wolfTargetRot = normX * 2.2;
+
+      // Soft eye illumination on proximity
+      if (wolfEyes) {
+        const wolfRect = wolfSilhouette.getBoundingClientRect();
+        const wolfCenterX = wolfRect.left + wolfRect.width / 2;
+        const wolfCenterY = wolfRect.top + wolfRect.height / 2;
+        const dist = Math.hypot(mouseX - wolfCenterX, mouseY - wolfCenterY);
+        if (dist < 480) {
+          wolfEyes.classList.add('eye-gleam');
+          wolfSilhouette.classList.add('wolf-gaze-active');
+        } else {
+          wolfEyes.classList.remove('eye-gleam');
+          wolfSilhouette.classList.remove('wolf-gaze-active');
+        }
+      }
+    }
+  }, { passive: true });
+
+  document.documentElement.addEventListener('mouseleave', () => {
+    isMouseInView = false;
+    cursorDot.style.opacity = '0';
+    cursorRing.style.opacity = '0';
+    mouseGlow.style.opacity = '0';
+    trailDots.forEach(t => t.el.style.opacity = '0');
+  });
+
+  document.documentElement.addEventListener('mouseenter', () => {
+    isMouseInView = true;
+    cursorDot.style.opacity = '1';
+    cursorRing.style.opacity = '1';
+    mouseGlow.style.opacity = '1';
+    trailDots.forEach(t => t.el.style.opacity = t.targetOpacity);
+  });
+
+  window.addEventListener('mousedown', () => {
+    cursorRing.classList.add('cursor-clicked');
+  });
+
+  window.addEventListener('mouseup', () => {
+    cursorRing.classList.remove('cursor-clicked');
+  });
+
+  // Interactive Hover Delegation (Buttons, Links, Cards, Inputs)
+  const interactiveSelector = 'a, button, input, textarea, select, .btn, .template-card, .service-row, .game-card, .pricing-mini-card, .split-viewer-card, .pillar-card, .process-card, [role="button"], .play-tab-btn, .filter-btn, .currency-btn, summary';
+
+  document.body.addEventListener('mouseover', (e) => {
+    const target = e.target.closest(interactiveSelector);
+    if (target) {
+      isHoveringInteractive = true;
+      cursorRing.classList.add('cursor-active');
+      cursorDot.classList.add('cursor-active');
+    }
+  });
+
+  document.body.addEventListener('mouseout', (e) => {
+    const target = e.target.closest(interactiveSelector);
+    if (target) {
+      isHoveringInteractive = false;
+      cursorRing.classList.remove('cursor-active');
+      cursorDot.classList.remove('cursor-active');
+    }
+  });
+
+  // Sub-systems Initialization
+  initMagneticButtons();
+  init3DCardTilt();
+  initParallaxScrollLayers();
+
+  // Centralized Smooth RAF Render Loop
+  function tick() {
+    if (!isRunning) return;
+
+    if (isMouseInView) {
+      // 1. Cursor Dot: High responsiveness (lerp 0.75)
+      dotX += (mouseX - dotX) * 0.75;
+      dotY += (mouseY - dotY) * 0.75;
+      cursorDot.style.transform = `translate3d(${(dotX - 3.5).toFixed(1)}px, ${(dotY - 3.5).toFixed(1)}px, 0)`;
+
+      // 2. Cursor Ring: Liquid fluid glide (lerp 0.18)
+      ringX += (mouseX - ringX) * 0.18;
+      ringY += (mouseY - ringY) * 0.18;
+      const ringOffset = isHoveringInteractive ? 26 : 18;
+      cursorRing.style.transform = `translate3d(${(ringX - ringOffset).toFixed(1)}px, ${(ringY - ringOffset).toFixed(1)}px, 0)`;
+
+      // 3. Fading Light Trail
+      let leadX = dotX;
+      let leadY = dotY;
+      for (let i = 0; i < TRAIL_COUNT; i++) {
+        const point = trailDots[i];
+        const lerpRate = 0.38 - i * 0.045;
+        point.x += (leadX - point.x) * lerpRate;
+        point.y += (leadY - point.y) * lerpRate;
+        point.el.style.transform = `translate3d(${(point.x - point.size / 2).toFixed(1)}px, ${(point.y - point.size / 2).toFixed(1)}px, 0)`;
+        leadX = point.x;
+        leadY = point.y;
+      }
+
+      // 4. Mouse-Following Ambient Atmosphere (lerp 0.065)
+      glowX += (mouseX - glowX) * 0.065;
+      glowY += (mouseY - glowY) * 0.065;
+      mouseGlow.style.transform = `translate3d(${(glowX - 240).toFixed(1)}px, ${(glowY - 240).toFixed(1)}px, 0)`;
+
+      // 5. Wolf Mascot Head / Gaze Shift
+      if (wolfSilhouette) {
+        wolfCurX += (wolfTargetX - wolfCurX) * 0.08;
+        wolfCurY += (wolfTargetY - wolfCurY) * 0.08;
+        wolfCurRot += (wolfTargetRot - wolfCurRot) * 0.08;
+        wolfSilhouette.style.transform = `translateY(-50%) translate3d(${wolfCurX.toFixed(2)}px, ${wolfCurY.toFixed(2)}px, 0) rotate(${wolfCurRot.toFixed(2)}deg)`;
+      }
+
+      if (wolfMoonlight) {
+        wolfMoonlight.style.transform = `translate3d(${(-wolfCurX * 1.2).toFixed(1)}px, ${(-wolfCurY * 1.2).toFixed(1)}px, 0)`;
+      }
+    }
+
+    rafId = requestAnimationFrame(tick);
+  }
+
+  // Automatic CPU conservation when tab is backgrounded
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+      isRunning = false;
+      if (rafId) cancelAnimationFrame(rafId);
+    } else {
+      isRunning = true;
+      rafId = requestAnimationFrame(tick);
+    }
+  });
+
+  rafId = requestAnimationFrame(tick);
+}
+
+/**
+ * Subtle Magnetic Pull for Major CTA Buttons
+ */
+function initMagneticButtons() {
+  const ctaButtons = document.querySelectorAll(
+    '.btn-primary, .btn-secondary, .game-card-btn, .nav-actions .btn'
+  );
+
+  ctaButtons.forEach(btn => {
+    btn.classList.add('btn-magnetic');
+
+    btn.addEventListener('mousemove', (e) => {
+      const rect = btn.getBoundingClientRect();
+      const centerX = rect.left + rect.width / 2;
+      const centerY = rect.top + rect.height / 2;
+
+      // Restrained magnetic attraction (max 6.5px translation)
+      const pullX = Math.max(-6.5, Math.min(6.5, (e.clientX - centerX) * 0.2));
+      const pullY = Math.max(-5, Math.min(5, (e.clientY - centerY) * 0.2));
+
+      btn.style.transform = `translate3d(${pullX.toFixed(1)}px, ${pullY.toFixed(1)}px, 0)`;
+
+      const arrow = btn.querySelector('.arrow');
+      if (arrow) {
+        arrow.style.transform = `translateX(${(4 + pullX * 0.2).toFixed(1)}px)`;
+      }
+    });
+
+    btn.addEventListener('mouseleave', () => {
+      btn.style.transform = 'translate3d(0, 0, 0)';
+      const arrow = btn.querySelector('.arrow');
+      if (arrow) {
+        arrow.style.transform = '';
+      }
+    });
+  });
+}
+
+/**
+ * Premium 3D Card Perspective Tilt & Dynamic Radial Spotlight
+ */
+function init3DCardTilt() {
+  const cards = document.querySelectorAll(
+    '.template-card, .game-card, .pricing-mini-card, .pillar-card, .process-card, .play-spotlight-card, .split-viewer-card'
+  );
+
+  cards.forEach(card => {
+    card.classList.add('tilt-card');
+
+    card.addEventListener('mousemove', (e) => {
+      const rect = card.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+
+      card.style.setProperty('--mouse-x', `${x.toFixed(1)}px`);
+      card.style.setProperty('--mouse-y', `${y.toFixed(1)}px`);
+
+      // Gentle 3D perspective tilt (clamped to max 3.2 degrees)
+      const pctX = (x / rect.width - 0.5) * 2;
+      const pctY = (y / rect.height - 0.5) * 2;
+      const tiltX = (-pctY * 3.2).toFixed(2);
+      const tiltY = (pctX * 3.2).toFixed(2);
+
+      card.style.transform = `perspective(1000px) rotateX(${tiltX}deg) rotateY(${tiltY}deg) translate3d(0, -4px, 0)`;
+    });
+
+    card.addEventListener('mouseleave', () => {
+      card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) translate3d(0, 0, 0)';
+    });
+  });
+}
+
+/**
+ * Subtle Depth-Based Parallax on Scroll (Zero layout shifting)
+ */
+function initParallaxScrollLayers() {
+  const orb1 = document.querySelector('.ambient-orb-1');
+  const orb2 = document.querySelector('.ambient-orb-2');
+  let ticking = false;
+
+  window.addEventListener('scroll', () => {
+    if (!ticking) {
+      window.requestAnimationFrame(() => {
+        const sy = window.scrollY;
+        if (orb1) orb1.style.transform = `translate3d(0, ${(sy * 0.08).toFixed(1)}px, 0)`;
+        if (orb2) orb2.style.transform = `translate3d(0, ${(-sy * 0.06).toFixed(1)}px, 0)`;
+        ticking = false;
+      });
+      ticking = true;
+    }
+  }, { passive: true });
 }
 
 /* ==========================================================================
