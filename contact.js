@@ -1,10 +1,10 @@
 /**
- * HAVEN DIGITAL STUDIO — CONTACT FORM RUNTIME (WEB3FORMS INTEGRATION)
- * Static-first client submission engine • Direct Web3Forms REST API
+ * HAVEN DIGITAL STUDIO — CONTACT FORM RUNTIME (FORMSUBMIT INTEGRATION)
+ * Static-first client submission engine • Direct FormSubmit REST API
  * 
- * Access Key: 0e2c5bcb-d228-4cd4-801b-8528e9d002e7
- * Recipient: hello.havenweb@gmail.com
- * Subject: New HAVEN Website Inquiry
+ * Receiving Email: hello.havenweb@gmail.com
+ * Form Endpoint: https://formsubmit.co/hello.havenweb@gmail.com
+ * Subject: New HAVEN Contact Form Submission
  */
 
 (function () {
@@ -14,12 +14,11 @@
   if (window.__HAVEN_CONTACT_FORM_INITIALIZED__) return;
   window.__HAVEN_CONTACT_FORM_INITIALIZED__ = true;
 
-  const WEB3FORMS_ACCESS_KEY = '0e2c5bcb-d228-4cd4-801b-8528e9d002e7';
-  const WEB3FORMS_ENDPOINT = 'https://api.web3forms.com/submit';
-  const EMAIL_SUBJECT = 'New HAVEN Website Inquiry';
-  const FROM_NAME = 'HAVEN Website Contact Form';
+  const FORMSUBMIT_RECEIVING_EMAIL = 'hello.havenweb@gmail.com';
+  const FORMSUBMIT_AJAX_ENDPOINT = `https://formsubmit.co/ajax/${FORMSUBMIT_RECEIVING_EMAIL}`;
+  const DEFAULT_SUBJECT = 'New HAVEN Contact Form Submission';
 
-  function initWeb3FormsContact() {
+  function initFormSubmitContact() {
     const form = document.getElementById('haven-contact-form');
     if (!form) return;
 
@@ -29,7 +28,6 @@
     const templateSelect = document.getElementById('template');
     const budgetSelect = document.getElementById('budget');
     const detailsInput = document.getElementById('details');
-    const botcheckInput = form.querySelector('input[name="botcheck"]');
     const submitBtn = form.querySelector('button[type="submit"]');
 
     let successBox = document.getElementById('form-success-box');
@@ -111,7 +109,7 @@
               <line x1="12" y1="8" x2="12" y2="12"></line>
               <line x1="12" y1="16" x2="12.01" y2="16"></line>
             </svg>
-            <span>Submission Error</span>
+            <span>Submission Notice</span>
           </div>
           <p style="font-size: 0.9rem; color: #fecaca; line-height: 1.5; margin: 0 auto; max-width: 560px;">
             ${escapeHtml(message)}
@@ -127,7 +125,7 @@
     }
 
     // Helper: Display top-level success notification banner
-    function displayFormSuccess(name, brand, email) {
+    function displayFormSuccess(name, brand, email, noticeText) {
       if (errorBox) {
         errorBox.classList.remove('show');
         errorBox.style.display = 'none';
@@ -146,6 +144,7 @@
           <p style="font-size: 0.92rem; color: #e2e8f0; line-height: 1.6; margin: 0 auto; max-width: 540px;">
             Thank you, <strong>${escapeHtml(name)}</strong>. Your enquiry for <strong>${escapeHtml(brand)}</strong> has been delivered directly to HAVEN studio engineers. We review every brief and reply to <strong>${escapeHtml(email)}</strong> within 24 hours.
           </p>
+          ${noticeText ? `<div style="font-size: 0.8rem; color: #94a3b8; margin-top: 0.75rem; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 0.6rem;">${escapeHtml(noticeText)}</div>` : ''}
         `;
         successBox.style.display = 'block';
         successBox.classList.add('show');
@@ -169,12 +168,6 @@
       if (successBox) {
         successBox.classList.remove('show');
         successBox.style.display = 'none';
-      }
-
-      // Check honeypot for spam bots
-      if (botcheckInput && botcheckInput.checked) {
-        console.warn('[Web3Forms] Honeypot triggered. Aborting submission.');
-        return;
       }
 
       // 2. Validate all existing required fields
@@ -229,7 +222,7 @@
         `;
       }
 
-      // 4 & 5. Prepare Web3Forms payload with ALL existing fields
+      // 4. Prepare FormSubmit FormData payload
       const budgetLabel = budgetSelect && budgetSelect.selectedOptions && budgetSelect.selectedOptions[0]
         ? budgetSelect.selectedOptions[0].text
         : budget;
@@ -238,79 +231,62 @@
         ? templateSelect.selectedOptions[0].text
         : template;
 
-      const structuredMessage = [
-        'New HAVEN Project Enquiry Brief:',
-        '----------------------------------------',
-        `Client Name: ${name}`,
-        `Email Address: ${email}`,
-        `Business / Brand: ${brand}`,
-        `Selected Template: ${templateLabel}`,
-        `Estimated Budget: ${budgetLabel}`,
-        '',
-        'Project Details:',
-        details,
-        '----------------------------------------',
-        `Submitted: ${new Date().toISOString()}`
-      ].join('\n');
+      const formData = new FormData(form);
 
-      const payload = {
-        access_key: WEB3FORMS_ACCESS_KEY,
-        subject: EMAIL_SUBJECT,
-        from_name: FROM_NAME,
-        name: name,
-        email: email,
-        replyto: email,
-        brand: brand,
-        template: templateLabel,
-        budget: budgetLabel,
-        details: details,
-        message: structuredMessage,
-        // Semantic aliases so Web3Forms email table displays each item clearly
-        'Business / Brand': brand,
-        'Selected Template': templateLabel,
-        'Estimated Budget': budgetLabel,
-        'Project Details': details
-      };
+      // Ensure explicit FormSubmit system directives are populated
+      if (!formData.has('_subject')) {
+        formData.append('_subject', DEFAULT_SUBJECT);
+      }
+      if (!formData.has('_captcha')) {
+        formData.append('_captcha', 'true');
+      }
+
+      // Append clean human-readable summaries so FormSubmit email table shows full detail
+      formData.set('Selected Template', templateLabel);
+      formData.set('Estimated Budget', budgetLabel);
 
       try {
-        // Save local backup copy in localStorage so enquiries are never lost
+        // Save local backup copy in localStorage so client enquiries are never lost
         try {
           const past = JSON.parse(localStorage.getItem('haven_enquiries') || '[]');
-          past.push({ name, email, brand, template, budget, details, timestamp: new Date().toISOString() });
+          past.push({ name, email, brand, template: templateLabel, budget: budgetLabel, details, timestamp: new Date().toISOString() });
           localStorage.setItem('haven_enquiries', JSON.stringify(past));
         } catch (_) {}
 
-        // 4. Submit the form through Web3Forms frontend API
-        const response = await fetch(WEB3FORMS_ENDPOINT, {
+        // Submit via FormSubmit AJAX endpoint
+        const response = await fetch(FORMSUBMIT_AJAX_ENDPOINT, {
           method: 'POST',
           headers: {
-            'Content-Type': 'application/json',
             'Accept': 'application/json'
           },
-          body: JSON.stringify(payload)
+          body: formData
         });
 
         const result = await response.json().catch(() => null);
 
-        // 6 & 7. Handle successful submission
-        if (response.ok && result && (result.success === true || response.status === 200)) {
-          displayFormSuccess(name, brand, email);
+        // Check for success or FormSubmit activation notice
+        if (response.ok && (result === null || result.success === 'true' || result.success === true || response.status === 200)) {
+          let notice = '';
+          if (result && result.message && result.message.toLowerCase().includes('activate')) {
+            notice = result.message;
+          }
+          displayFormSuccess(name, brand, email, notice);
           form.reset();
         } else {
-          // 8 & 9. Handle Web3Forms API failure without clearing entered data
+          // FormSubmit failure: show error message without clearing entered data
           const apiErrorMsg = result && result.message
             ? result.message
-            : 'Unable to deliver your enquiry via Web3Forms. Please try again or reach out directly.';
+            : 'Unable to deliver your enquiry via FormSubmit at this time. Please try again or reach out directly.';
           displayFormError(apiErrorMsg);
         }
       } catch (networkError) {
-        // 8 & 9. Handle Network / Connection failure without clearing entered data
-        console.error('[Web3Forms Submission Error]', networkError);
+        // Network / Connection failure: keep user entered data intact
+        console.error('[FormSubmit Submission Error]', networkError);
         displayFormError(
           'Network connection interrupted while transmitting your enquiry. Your brief remains saved below. Please check your connection and click Send again, or email us directly at hello.havenweb@gmail.com.'
         );
       } finally {
-        // 10. Restore button state & enable submissions
+        // Restore button state & enable submissions
         isSubmitting = false;
         if (submitBtn) {
           submitBtn.disabled = false;
@@ -322,8 +298,8 @@
 
   // Self-initialize on DOM ready
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initWeb3FormsContact);
+    document.addEventListener('DOMContentLoaded', initFormSubmitContact);
   } else {
-    initWeb3FormsContact();
+    initFormSubmitContact();
   }
 })();

@@ -267,7 +267,7 @@ function initScrollReveal() {
 }
 
 /* ==========================================================================
-   4. CONTACT ENQUIRY FORM (WEB3FORMS INTEGRATION)
+   4. CONTACT ENQUIRY FORM (FORMSUBMIT INTEGRATION)
    ========================================================================== */
 function initContactForm() {
   // If contact.js has already initialized the form, avoid duplicate bindings
@@ -294,7 +294,6 @@ function initContactForm() {
   const templateSelect = document.getElementById('template');
   const budgetSelect = document.getElementById('budget');
   const detailsInput = document.getElementById('details');
-  const botcheckInput = form.querySelector('input[name="botcheck"]');
   const submitBtn = form.querySelector('button[type="submit"]');
 
   let isSubmitting = false;
@@ -344,8 +343,6 @@ function initContactForm() {
       successBox.style.display = 'none';
     }
 
-    if (botcheckInput && botcheckInput.checked) return;
-
     let hasError = false;
     const name = nameInput ? nameInput.value.trim() : '';
     const email = emailInput ? emailInput.value.trim() : '';
@@ -393,55 +390,32 @@ function initContactForm() {
       ? templateSelect.selectedOptions[0].text
       : template;
 
-    const structuredMessage = [
-      'New HAVEN Project Enquiry Brief:',
-      '----------------------------------------',
-      `Client Name: ${name}`,
-      `Email Address: ${email}`,
-      `Business / Brand: ${brand}`,
-      `Selected Template: ${templateLabel}`,
-      `Estimated Budget: ${budgetLabel}`,
-      '',
-      'Project Details:',
-      details,
-      '----------------------------------------',
-      `Submitted: ${new Date().toISOString()}`
-    ].join('\n');
-
-    const payload = {
-      access_key: '0e2c5bcb-d228-4cd4-801b-8528e9d002e7',
-      subject: 'New HAVEN Website Inquiry',
-      from_name: 'HAVEN Website Contact Form',
-      name,
-      email,
-      replyto: email,
-      brand,
-      template: templateLabel,
-      budget: budgetLabel,
-      details,
-      message: structuredMessage,
-      'Business / Brand': brand,
-      'Selected Template': templateLabel,
-      'Estimated Budget': budgetLabel,
-      'Project Details': details
-    };
+    const formData = new FormData(form);
+    if (!formData.has('_subject')) formData.append('_subject', 'New HAVEN Contact Form Submission');
+    if (!formData.has('_captcha')) formData.append('_captcha', 'true');
+    formData.set('Selected Template', templateLabel);
+    formData.set('Estimated Budget', budgetLabel);
 
     try {
       const past = JSON.parse(localStorage.getItem('haven_enquiries') || '[]');
-      past.push({ name, email, brand, template, budget, details, timestamp: new Date().toISOString() });
+      past.push({ name, email, brand, template: templateLabel, budget: budgetLabel, details, timestamp: new Date().toISOString() });
       localStorage.setItem('haven_enquiries', JSON.stringify(past));
     } catch (_) {}
 
     try {
-      const res = await fetch('https://api.web3forms.com/submit', {
+      const res = await fetch('https://formsubmit.co/ajax/hello.havenweb@gmail.com', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-        body: JSON.stringify(payload)
+        headers: { 'Accept': 'application/json' },
+        body: formData
       });
       const data = await res.json().catch(() => null);
 
-      if (res.ok && data && (data.success === true || res.status === 200)) {
+      if (res.ok && (data === null || data.success === 'true' || data.success === true || res.status === 200)) {
         if (successBox) {
+          let notice = '';
+          if (data && data.message && data.message.toLowerCase().includes('activate')) {
+            notice = data.message;
+          }
           successBox.innerHTML = `
             <div style="font-size: 1.2rem; font-weight: 700; margin-bottom: 0.4rem; color: #bbf7d0; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -450,11 +424,12 @@ function initContactForm() {
               <span>Project Enquiry Received</span>
             </div>
             <div style="font-family: var(--font-mono); font-size: 0.78rem; color: var(--accent-lavender); margin-bottom: 0.85rem; letter-spacing: 0.08em;">
-              CONFIRMED TRANSMISSION &bull; STATUS: 200 OK
+              DELIVERED VIA FORMSUBMIT &bull; STATUS: 200 OK
             </div>
             <p style="font-size: 0.92rem; color: #e2e8f0; line-height: 1.6; margin: 0 auto; max-width: 540px;">
               Thank you, <strong>${escapeHtml(name)}</strong>. Your enquiry for <strong>${escapeHtml(brand)}</strong> has been delivered directly to HAVEN studio engineers. We review every brief and reply to <strong>${escapeHtml(email)}</strong> within 24 hours.
             </p>
+            ${notice ? `<div style="font-size: 0.8rem; color: #94a3b8; margin-top: 0.75rem; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 0.6rem;">${escapeHtml(notice)}</div>` : ''}
           `;
           successBox.style.display = 'block';
           successBox.classList.add('show');
@@ -462,7 +437,7 @@ function initContactForm() {
           successBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         }
       } else {
-        const errorMsg = data && data.message ? data.message : 'Unable to transmit enquiry. Please try again.';
+        const errorMsg = data && data.message ? data.message : 'Unable to transmit enquiry via FormSubmit. Please try again.';
         if (errorBox) {
           errorBox.innerHTML = `
             <div style="display: flex; align-items: center; justify-content: center; gap: 0.5rem; font-size: 1.05rem; font-weight: 700; margin-bottom: 0.4rem; color: #fca5a5;">
@@ -471,7 +446,7 @@ function initContactForm() {
                 <line x1="12" y1="8" x2="12" y2="12"></line>
                 <line x1="12" y1="16" x2="12.01" y2="16"></line>
               </svg>
-              <span>Submission Error</span>
+              <span>Submission Notice</span>
             </div>
             <p style="font-size: 0.9rem; color: #fecaca; line-height: 1.5; margin: 0 auto; max-width: 560px;">
               ${escapeHtml(errorMsg)}

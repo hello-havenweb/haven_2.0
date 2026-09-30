@@ -116,12 +116,11 @@
             <p class="template-notice-text">You're interested in the <strong id="template-notice-name">NEXUS</strong> template.</p>
           </div>
 
-          <form id="haven-contact-form">
-            <!-- Web3Forms Configuration -->
-            <input type="hidden" name="access_key" value="0e2c5bcb-d228-4cd4-801b-8528e9d002e7">
-            <input type="hidden" name="subject" value="New HAVEN Website Inquiry">
-            <input type="hidden" name="from_name" value="HAVEN Website Contact Form">
-            <input type="checkbox" name="botcheck" class="hidden" style="display: none;">
+          <form id="haven-contact-form" action="https://formsubmit.co/hello.havenweb@gmail.com" method="POST">
+            <!-- FormSubmit Configuration -->
+            <input type="hidden" name="_subject" value="New HAVEN Contact Form Submission">
+            <input type="hidden" name="_captcha" value="true">
+            <input type="hidden" name="_template" value="table">
 
             <div class="form-grid">
 
