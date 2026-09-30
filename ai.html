@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>HAVEN AI — Voice Project Consultant &amp; Architecture</title>
-  <meta name="description" content="Consult HAVEN AI, our voice-powered digital agency consultant. Speak naturally to explore custom websites, templates, pricing, and compile a project brief.">
+  <title>HAVEN AI (Coming Soon) — Project Consultant &amp; Architecture</title>
+  <meta name="description" content="HAVEN AI is our upcoming conversational project consultant, currently under active development. Explore our design systems and initiate projects directly via our studio desk.">
   <link rel="icon" type="image/png" href="favicon.png">
   <link rel="stylesheet" href="style.css">
 </head>
@@ -29,6 +29,7 @@
           <li><a href="services.html" class="nav-link">Services</a></li>
           <li><a href="pricing.html" class="nav-link">Pricing</a></li>
           <li><a href="about.html" class="nav-link">About</a></li>
+          <li><a href="play.html" class="nav-link">Play</a></li>
           <li><a href="ai.html" class="nav-link active">HAVEN AI</a></li>
           <li><a href="contact.html" class="nav-link">Contact</a></li>
         </ul>
@@ -60,8 +61,11 @@
           YOUR NEXT WEBSITE STARTS <br>
           <span class="gradient-text">WITH A CONVERSATION.</span>
         </h1>
-        <p class="lead-text" style="margin: 0 auto 2.5rem; max-width: 660px;">
-          Tell HAVEN AI what you're imagining. Discuss your business, your goals, your design preferences and everything you need for your website.
+        <p class="lead-text" style="margin: 0 auto 1.5rem; max-width: 660px;">
+          HAVEN AI is currently under active development as our upcoming conversational project consultant. In the future, founders and creators will be able to speak or type naturally to explore bespoke architectures, select design systems, and compile a structured brief.
+        </p>
+        <p style="font-size: 0.95rem; color: var(--accent-lilac); margin: 0 auto 2.5rem; max-width: 620px;">
+          While this system is being refined for public release, all project consultations, custom briefs, and template customizations are handled directly by our studio engineering team.
         </p>
 
         <div style="display: flex; gap: 1rem; justify-content: center; align-items: center; flex-wrap: wrap;">
@@ -69,190 +73,31 @@
             <span style="margin-right: 0.5rem; font-size: 1.1rem;">✦</span>
             Coming Soon
           </button>
-          <a href="#how-it-works" class="btn btn-secondary btn-lg" style="padding: 1rem 1.8rem;">
-            HOW IT WORKS &darr;
+          <a href="contact.html" class="btn btn-secondary btn-lg" style="padding: 1rem 1.8rem;">
+            Initiate Project Enquiry &rarr;
           </a>
         </div>
 
         <p style="font-size: 0.78rem; color: var(--text-faint); margin-top: 1.75rem;">
-          Your information is used to help HAVEN understand your project enquiry. Read our <a href="privacy.html" style="color: var(--accent-lavender); text-decoration: underline;">Privacy Policy</a>.
+          Direct inquiries reviewed within 24 hours. Read our <a href="privacy.html" style="color: var(--accent-lavender); text-decoration: underline;">Privacy Policy</a>.
         </p>
       </div>
 
-      <!-- INTERACTIVE AI STUDIO (REVEALED UPON STARTING) -->
-      <div id="ai-studio-canvas" class="ai-interactive-card" style="margin-top: 4rem; display: none;">
-
-        <!-- STUDIO HEADER & STATUS BAR -->
-        <div class="ai-studio-header">
-          <div class="ai-status-wrap">
-            <div id="ai-orb" class="ai-orb-wrap">
-              <div class="ai-orb-halo"></div>
-              <div class="ai-orb-core"></div>
-            </div>
-            <div class="ai-status-text-block">
-              <div class="ai-title-badge">
-                <span>HAVEN AI</span>
-                <span style="color: var(--accent-violet); font-size: 0.8rem;">✦</span>
-                <span id="ai-lang-pill" style="font-size: 0.68rem; color: #94a3b8; background: rgba(255,255,255,0.06); padding: 1px 6px; border-radius: 4px; margin-left: 4px;">EN</span>
-              </div>
-              <div id="ai-live-status" class="ai-live-indicator">
-                <span class="status-dot-pulse"></span>
-                <span id="ai-status-text">● Ready</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- TOPBAR CONTROLS -->
-          <div class="ai-toolbar-actions">
-            <button id="mute-voice-btn" class="ai-tool-btn" title="Toggle audio speech synthesis">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
-              <span id="mute-label">Audio On</span>
-            </button>
-            <button id="stop-speaking-btn" class="ai-tool-btn" style="display: none;" title="Interrupt AI speech">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="6" width="12" height="12"></rect></svg>
-              <span>Stop Speaking</span>
-            </button>
-            <button id="reset-session-btn" class="ai-tool-btn active-danger" title="Restart conversation">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path></svg>
-              <span>Restart</span>
-            </button>
-          </div>
+      <!-- ARCHITECTURAL PREVIEW CARD -->
+      <div class="ai-interactive-card" style="margin-top: 4rem; text-align: center; padding: 3.5rem 2rem;">
+        <div class="ai-orb-wrap" style="margin: 0 auto 1.5rem;">
+          <div class="ai-orb-halo"></div>
+          <div class="ai-orb-core"></div>
         </div>
-
-        <!-- REAL-TIME PROJECT BRIEF PROGRESS BAR -->
-        <div class="ai-brief-pill-bar">
-          <span style="color: var(--text-faint); font-family: var(--font-mono); font-size: 0.72rem; text-transform: uppercase;">BRIEF PROGRESS:</span>
-          <div id="pill-name" class="brief-pill-tag">Client: <strong id="val-name">—</strong></div>
-          <div id="pill-biz" class="brief-pill-tag">Business: <strong id="val-biz">—</strong></div>
-          <div id="pill-type" class="brief-pill-tag">Type: <strong id="val-type">—</strong></div>
-          <div id="pill-template" class="brief-pill-tag">Template: <strong id="val-template">—</strong></div>
-          <div id="pill-budget" class="brief-pill-tag">Budget: <strong id="val-budget">—</strong></div>
+        <div class="eyebrow" style="margin-bottom: 0.75rem;">ARCHITECTURAL PREVIEW</div>
+        <h3 style="font-size: 1.6rem; color: #ffffff; margin-bottom: 0.75rem;">Conversational Discovery in Development</h3>
+        <p style="color: var(--text-muted); font-size: 0.95rem; max-width: 580px; margin: 0 auto 2rem; line-height: 1.6;">
+          We are engineering HAVEN AI to model complex domain hierarchies, design tokens, and sovereign code delivery. In the meantime, explore our 6 flagship multi-page systems or consult our studio engineers directly.
+        </p>
+        <div style="display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap;">
+          <a href="contact.html" class="btn btn-primary btn-sm">Submit Project Brief &rarr;</a>
+          <a href="templates.html" class="btn btn-secondary btn-sm">Explore All 6 Templates</a>
         </div>
-
-        <!-- CONVERSATION MESSAGE THREAD -->
-        <div id="ai-conversation-thread" class="ai-conversation-area">
-          <!-- Initial welcome bubble -->
-          <div class="ai-chat-bubble assistant">
-            <div class="chat-bubble-author">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="10"></circle></svg>
-              HAVEN AI &bull; Senior Consultant
-            </div>
-            <div class="chat-bubble-text">
-              Welcome to HAVEN. I'm your digital project consultant. Tell me what you're imagining for your website—your business concept, industry, and the core features you need.
-            </div>
-          </div>
-        </div>
-
-        <!-- PROJECT SUMMARY CONFIRMATION CARD (DYNAMIC) -->
-        <div id="ai-summary-box" class="ai-summary-overlay">
-          <div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 1rem;">
-            <div>
-              <div class="eyebrow" style="margin-bottom: 0.5rem; font-size: 0.7rem; padding: 0.2rem 0.6rem;">PROJECT BLUEPRINT</div>
-              <h3 style="font-size: 1.4rem; color: #ffffff; margin: 0;">YOUR HAVEN PROJECT</h3>
-            </div>
-            <span style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--accent-lavender); background: rgba(147, 51, 234, 0.2); padding: 0.25rem 0.65rem; border-radius: 4px;">
-              CONFIRMATION REQUIRED
-            </span>
-          </div>
-
-          <div class="summary-grid-2">
-            <div class="summary-item-box">
-              <div class="label">Client Name</div>
-              <div id="sum-client" class="val">—</div>
-            </div>
-            <div class="summary-item-box">
-              <div class="label">Contact Email</div>
-              <div id="sum-email" class="val">—</div>
-            </div>
-            <div class="summary-item-box">
-              <div class="label">Brand / Venture</div>
-              <div id="sum-brand" class="val">—</div>
-            </div>
-            <div class="summary-item-box">
-              <div class="label">Business Type</div>
-              <div id="sum-biztype" class="val">—</div>
-            </div>
-            <div class="summary-item-box">
-              <div class="label">Suggested Template</div>
-              <div id="sum-template" class="val" style="color: var(--accent-cyan); font-weight: 700;">—</div>
-            </div>
-            <div class="summary-item-box">
-              <div class="label">Required Pages</div>
-              <div id="sum-pages" class="val">—</div>
-            </div>
-            <div class="summary-item-box">
-              <div class="label">Desired Features</div>
-              <div id="sum-features" class="val">—</div>
-            </div>
-            <div class="summary-item-box">
-              <div class="label">Estimated Budget</div>
-              <div id="sum-budget" class="val">—</div>
-            </div>
-          </div>
-
-          <div id="sum-additional-box" style="margin-bottom: 1.5rem; display: none;">
-            <div style="font-size: 0.78rem; text-transform: uppercase; color: var(--text-faint); margin-bottom: 0.4rem; font-family: var(--font-mono);">Additional Scope Notes</div>
-            <div id="sum-notes" style="font-size: 0.88rem; color: #cbd5e1; background: rgba(255,255,255,0.03); padding: 0.85rem; border-radius: 6px;"></div>
-          </div>
-
-          <p style="font-size: 0.85rem; color: #94a3b8; line-height: 1.6; margin-bottom: 1.5rem;">
-            Would you like me to transmit this finalized project brief to the HAVEN design &amp; engineering team? They will review your requirements and follow up with a confirmed quote and roadmap.
-          </p>
-
-          <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
-            <button id="edit-details-btn" class="btn btn-secondary" style="flex: 1;">
-              EDIT DETAILS
-            </button>
-            <button id="send-enquiry-btn" class="btn btn-primary" style="flex: 1.5; box-shadow: 0 0 25px rgba(168, 85, 247, 0.4);">
-              SEND ENQUIRY &rarr;
-            </button>
-          </div>
-        </div>
-
-        <!-- SUBMISSION CONFIRMATION OVERLAY -->
-        <div id="ai-success-box" class="ai-summary-overlay" style="border-color: #22c55e;">
-          <div style="text-align: center; padding: 1.5rem 1rem;">
-            <div style="width: 56px; height: 56px; border-radius: 50%; background: rgba(34, 197, 94, 0.15); border: 1px solid #22c55e; color: #4ade80; display: inline-flex; align-items: center; justify-content: center; font-size: 1.8rem; margin-bottom: 1rem;">
-              ✓
-            </div>
-            <h3 style="font-size: 1.6rem; color: #ffffff; margin-bottom: 0.5rem;">Enquiry Transmitted to HAVEN</h3>
-            <p style="color: #cbd5e1; font-size: 0.95rem; max-width: 540px; margin: 0 auto 1.5rem;">
-              Your project blueprint has been securely logged and dispatched to our principal design team. We review all submissions within 24 hours.
-            </p>
-            <div style="background: rgba(255,255,255,0.04); display: inline-block; padding: 0.5rem 1.25rem; border-radius: 6px; font-family: var(--font-mono); font-size: 0.85rem; color: #a7f3d0; margin-bottom: 2rem;">
-              REFERENCE ID: <strong id="success-ref-id">HVN-2026-X</strong>
-            </div>
-            <div>
-              <a href="templates.html" class="btn btn-secondary btn-sm" style="margin-right: 0.5rem;">Browse Templates</a>
-              <button id="new-consultation-btn" class="btn btn-primary btn-sm">Start New Project</button>
-            </div>
-          </div>
-        </div>
-
-        <!-- BOTTOM INPUT & VOICE CONSOLE -->
-        <div class="ai-input-console">
-          <!-- Big Interactive Microphone Button -->
-          <button id="master-mic-btn" class="ai-master-mic-btn" aria-label="Toggle voice input" title="Click to speak naturally">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
-              <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
-              <line x1="12" y1="19" x2="12" y2="23"></line>
-              <line x1="8" y1="23" x2="16" y2="23"></line>
-            </svg>
-          </button>
-
-          <!-- Text Fallback Input -->
-          <div class="ai-text-input-wrap">
-            <input type="text" id="ai-text-input" class="ai-text-input-field" placeholder="Type your message in English, Urdu, or any language..." autocomplete="off">
-            <button id="ai-send-btn" class="ai-send-btn" aria-label="Send message" title="Send message">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <line x1="22" y1="2" x2="11" y2="13"></line>
-                <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
-              </svg>
-            </button>
-          </div>
-        </div>
-
       </div>
 
     </div>
@@ -264,11 +109,11 @@
       <div class="section-header text-center reveal">
         <div class="eyebrow">
           <span class="eyebrow-dot"></span>
-          WORKFLOW
+          WORKFLOW PREVIEW
         </div>
-        <h2 class="section-title">How HAVEN AI Works</h2>
+        <h2 class="section-title">How HAVEN AI Will Work</h2>
         <p class="lead-text">
-          A seamless conversational path from initial idea to a complete, confirmed project brief.
+          A preview of our planned conversational workflow from initial vision to a finalized project brief.
         </p>
       </div>
 
@@ -346,6 +191,7 @@
             <li><a href="services.html">Services</a></li>
             <li><a href="pricing.html">Pricing</a></li>
             <li><a href="about.html">About</a></li>
+            <li><a href="play.html">Play</a></li>
             <li><a href="ai.html">HAVEN AI</a></li>
             <li><a href="contact.html">Contact</a></li>
           </ul>
@@ -381,23 +227,13 @@
     </div>
   </footer>
 
-  <!-- FLOATING HAVEN AI BADGE -->
-  <a href="ai.html" class="floating-ai-btn" aria-label="Open HAVEN AI Voice Assistant" title="Consult HAVEN AI">
+  <!-- FLOATING HAVEN AI BADGE (COMING SOON) -->
+  <a href="ai.html" class="floating-ai-btn" aria-label="HAVEN AI — In Development (Coming Soon)" title="HAVEN AI (Coming Soon)">
     <span class="ai-sparkle">✦</span>
     <span>HAVEN AI</span>
+    <span class="floating-ai-badge">Soon</span>
   </a>
 
-  <!-- HAVEN AI BACKEND CONFIGURATION -->
-  <script>
-    // Configurable backend API base URL for static frontend deployments (e.g. haven.pntr.dev)
-    // When hosted on the full-stack server directly or locally, relative '' is used.
-    // For static hosting at haven.pntr.dev, automatically connects to the deployed backend URL.
-    window.HAVEN_API_BASE_URL = window.HAVEN_API_BASE_URL || (
-      window.location.hostname === 'haven.pntr.dev'
-        ? 'https://ais-pre-i4nqoz75rmkkyd6niczn64-1276637696.asia-southeast1.run.app'
-        : ''
-    );
-  </script>
   <script src="script.js" defer></script>
 </body>
 </html>

@@ -2133,6 +2133,20 @@ h1, h2, h3, h4, .brand-font {
   animation: pulse-dot 2.5s infinite;
 }
 
+.floating-ai-badge {
+  display: inline-block;
+  font-size: 0.62rem;
+  letter-spacing: 0.08em;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--accent-lavender);
+  background: rgba(168, 85, 247, 0.22);
+  border: 1px solid rgba(168, 85, 247, 0.45);
+  border-radius: 999px;
+  padding: 0.1rem 0.45rem;
+  line-height: 1.2;
+}
+
 @media (max-width: 640px) {
   .floating-ai-btn {
     bottom: 1.25rem;

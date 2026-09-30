@@ -645,9 +645,10 @@ function initParallaxEffects() {
    8. HAVEN AI — VOICE & TEXT CONSULTANT RUNTIME
    ========================================================================== */
 function initHavenAI() {
-  const startBtn = document.getElementById('start-conversation-btn');
   const canvas = document.getElementById('ai-studio-canvas');
-  if (!startBtn && !canvas) return;
+  if (!canvas) return;
+
+  const startBtn = document.getElementById('start-conversation-btn');
 
   const micBtn = document.getElementById('master-mic-btn');
   const textInput = document.getElementById('ai-text-input');

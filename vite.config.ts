@@ -11,6 +11,7 @@ export default defineConfig(() => {
       rollupOptions: {
         input: {
           main: resolve(__dirname, 'index.html'),
+          play: resolve(__dirname, 'play.html'),
           ai: resolve(__dirname, 'ai.html'),
           services: resolve(__dirname, 'services.html'),
           templates: resolve(__dirname, 'templates.html'),
