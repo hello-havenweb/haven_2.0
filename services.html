@@ -12,36 +12,77 @@
 
   <!-- NAVIGATION -->
   <header class="site-header">
-    <div class="container">
-      <nav class="nav-wrap">
-        <a href="index.html" class="nav-brand">
-          <div class="brand-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
-            </svg>
-          </div>
-          <span>HAVEN</span>
-        </a>
+    <div class="container header-container">
+      <nav class="nav-wrap" aria-label="Main Navigation">
+        <!-- 1. LEFT BRAND ANCHOR -->
+        <div class="nav-brand-wrap">
+          <a href="index.html" class="nav-brand" aria-label="HAVEN — Home">
+            <div class="brand-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+              </svg>
+            </div>
+            <span class="brand-text">HAVEN</span>
+          </a>
+        </div>
 
-        <ul class="nav-menu">
-          <li><a href="index.html" class="nav-link">Home</a></li>
-          <li><a href="templates.html" class="nav-link">Templates</a></li>
-          <li><a href="services.html" class="nav-link active">Services</a></li>
-          <li><a href="pricing.html" class="nav-link">Pricing</a></li>
-          <li><a href="about.html" class="nav-link">About</a></li>
-          <li><a href="play.html" class="nav-link">Play</a></li>
-          <li><a href="ai.html" class="nav-link">HAVEN AI</a></li>
-          <li><a href="contact.html" class="nav-link">Contact</a></li>
-        </ul>
+        <!-- 2. CENTER MAIN NAVIGATION -->
+        <div class="nav-menu-wrap">
+          <ul class="nav-menu" id="primary-nav-menu">
+            <li class="mobile-drawer-header" aria-hidden="true">
+              <div class="mobile-drawer-brand">
+                <span class="mobile-drawer-logo">HAVEN</span>
+                <span class="mobile-drawer-tagline">DIGITAL STUDIO</span>
+              </div>
+              <button class="mobile-drawer-close" aria-label="Close navigation menu">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="18" y1="6" x2="6" y2="18"></line>
+                  <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+              </button>
+            </li>
+            <li><a href="index.html" class="nav-link">Home</a></li>
+            <li><a href="templates.html" class="nav-link">Templates</a></li>
+            <li><a href="services.html" class="nav-link active">Services</a></li>
+            <li><a href="pricing.html" class="nav-link">Pricing</a></li>
+            <li><a href="about.html" class="nav-link">About</a></li>
+            <li>
+              <a href="ai.html" class="nav-link nav-link-feature nav-link-ai" title="HAVEN AI Consultation">
+                <span class="nav-feature-sparkle" aria-hidden="true">✦</span>
+                <span>HAVEN AI</span>
+              </a>
+            </li>
+            <li>
+              <a href="play.html" class="nav-link nav-link-feature nav-link-play" title="HAVEN PLAY Digital Experiments">
+                <span class="nav-feature-dot" aria-hidden="true"></span>
+                <span>HAVEN PLAY</span>
+              </a>
+            </li>
+            <li><a href="contact.html" class="nav-link">Contact</a></li>
+            <li class="mobile-menu-cta-wrap">
+              <a href="contact.html" class="btn btn-primary btn-mobile-cta">
+                <span>Get Started</span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                  <polyline points="12 5 19 12 12 19"></polyline>
+                </svg>
+              </a>
+              <div class="mobile-drawer-footer">
+                <span>Direct Studio Commission &bull; hello.havenweb@gmail.com</span>
+              </div>
+            </li>
+          </ul>
+        </div>
 
+        <!-- 3. RIGHT ACTION ANCHOR -->
         <div class="nav-actions">
-          <a href="contact.html" class="btn btn-primary btn-sm">Get Started</a>
-          <button class="nav-toggle" aria-label="Toggle navigation menu">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <line x1="3" y1="12" x2="21" y2="12"></line>
-              <line x1="3" y1="6" x2="21" y2="6"></line>
-              <line x1="3" y1="18" x2="21" y2="18"></line>
-            </svg>
+          <a href="contact.html" class="btn btn-primary btn-sm btn-nav-cta">Get Started</a>
+          <button class="nav-toggle" aria-label="Toggle navigation menu" aria-controls="primary-nav-menu" aria-expanded="false">
+            <span class="hamburger-box" aria-hidden="true">
+              <span class="hamburger-bar bar-1"></span>
+              <span class="hamburger-bar bar-2"></span>
+              <span class="hamburger-bar bar-3"></span>
+            </span>
           </button>
         </div>
       </nav>

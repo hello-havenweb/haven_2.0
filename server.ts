@@ -487,8 +487,13 @@ app.post('/api/submit-enquiry', async (req: Request, res: Response) => {
   }
 });
 
+// 404 handler for undefined API routes
+app.all('/api/*', (_req: Request, res: Response) => {
+  res.status(404).json({ error: 'Endpoint not found.' });
+});
+
 // ============================================================================
-// 3. Mount Vite in Dev Mode or Static Files in Production
+// 4. Mount Vite in Dev Mode or Static Files in Production
 // ============================================================================
 async function startServer() {
   if (!isProduction) {

@@ -201,19 +201,60 @@ function initNightDaySlider() {
 function initMobileNav() {
   const toggleBtn = document.querySelector('.nav-toggle');
   const navMenu = document.querySelector('.nav-menu');
+  const closeBtn = document.querySelector('.mobile-drawer-close');
 
   if (!toggleBtn || !navMenu) return;
 
-  toggleBtn.addEventListener('click', () => {
-    const isOpen = navMenu.classList.toggle('open');
-    toggleBtn.setAttribute('aria-expanded', isOpen);
+  function openMobileNav() {
+    navMenu.classList.add('open');
+    toggleBtn.setAttribute('aria-expanded', 'true');
+    document.body.classList.add('mobile-nav-locked');
+    if (closeBtn) closeBtn.focus();
+  }
+
+  function closeMobileNav() {
+    navMenu.classList.remove('open');
+    toggleBtn.setAttribute('aria-expanded', 'false');
+    document.body.classList.remove('mobile-nav-locked');
+  }
+
+  toggleBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const isOpen = navMenu.classList.contains('open');
+    if (isOpen) {
+      closeMobileNav();
+    } else {
+      openMobileNav();
+    }
   });
 
-  // Close menu when clicking outside
+  if (closeBtn) {
+    closeBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      closeMobileNav();
+      toggleBtn.focus();
+    });
+  }
+
+  // Close menu when clicking on any navigation link or CTA inside menu
+  navMenu.querySelectorAll('.nav-link, .btn-mobile-cta').forEach(link => {
+    link.addEventListener('click', () => {
+      closeMobileNav();
+    });
+  });
+
+  // Close when pressing Escape key
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && navMenu.classList.contains('open')) {
+      closeMobileNav();
+      toggleBtn.focus();
+    }
+  });
+
+  // Close menu when clicking outside menu content
   document.addEventListener('click', (e) => {
-    if (!toggleBtn.contains(e.target) && !navMenu.contains(e.target)) {
-      navMenu.classList.remove('open');
-      toggleBtn.setAttribute('aria-expanded', 'false');
+    if (navMenu.classList.contains('open') && !navMenu.contains(e.target) && !toggleBtn.contains(e.target)) {
+      closeMobileNav();
     }
   });
 }
